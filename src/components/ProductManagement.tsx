@@ -19,7 +19,7 @@ import {
   Move
 } from "lucide-react";
 import { Product, Category } from "../types";
-import { formatNTD } from "../utils/formatters";
+import { formatNTD, formatImageUrl } from "../utils/formatters";
 
 interface ProductManagementProps {
   products: Product[];
@@ -269,7 +269,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
               <tbody className="divide-y divide-[#E5E2D9]">
                 {filteredProducts.map((p) => {
                   const mainImage = p.images && p.images[0]?.src
-                    ? p.images[0].src
+                    ? formatImageUrl(p.images[0].src)
                     : "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=200";
 
                   return (
@@ -386,7 +386,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {filteredProducts.map((p) => {
             const mainImage = p.images && p.images[0]?.src
-              ? p.images[0].src
+              ? formatImageUrl(p.images[0].src)
               : "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=400";
 
             return (

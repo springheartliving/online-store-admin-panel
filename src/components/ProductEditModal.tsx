@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Plus, Trash2, Image as ImageIcon, Tag, Check, AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import { Product, Category, ProductImage, ProductAttribute } from "../types";
+import { formatImageUrl } from "../utils/formatters";
 
 interface ProductEditModalProps {
   isOpen: boolean;
@@ -435,7 +436,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                     <div className="relative h-24 bg-[#EAE7DC] rounded-xs overflow-hidden">
                       {img.src ? (
                         <img
-                          src={img.src}
+                          src={formatImageUrl(img.src)}
                           alt={img.alt || name}
                           className="w-full h-full object-cover"
                           onError={(e) => {

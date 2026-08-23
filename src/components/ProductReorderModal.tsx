@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Product } from "../types";
 import { saveProductsOrderToFirestore, fetchProductsFromFirestore } from "../lib/firebase";
+import { formatImageUrl } from "../utils/formatters";
 
 interface ProductReorderModalProps {
   isOpen: boolean;
@@ -172,7 +173,7 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
             <div className="space-y-1.5">
               {filteredProducts.map(({ product, originalIndex }) => {
                 const mainImage = product.images && product.images[0]?.src
-                  ? product.images[0].src
+                  ? formatImageUrl(product.images[0].src)
                   : "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=200";
 
                 const isFirst = originalIndex === 0;
