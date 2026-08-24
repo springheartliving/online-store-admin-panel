@@ -45,6 +45,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
   const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
   const [attrName, setAttrName] = useState<string>("");
   const [attrTerms, setAttrTerms] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<number>(0);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -61,6 +62,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       setSalePrice(product && product.sale_price ? product.sale_price : "");
       setInStock(product ? product.in_stock : true);
       setShortDescription(product ? product.short_description : "");
+      setSortOrder(product && product.sort_order !== undefined ? product.sort_order : 0);
       
       // Clean description/features to plain text without bullet prefixes
       let initialDesc = "";
@@ -221,7 +223,8 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       tags: mappedTags,
       images: validImages,
       attributes: attributes,
-      has_options: attributes.length > 0
+      has_options: attributes.length > 0,
+      sort_order: Number(sortOrder)
     };
 
     try {
@@ -320,7 +323,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
               價格與庫存狀態
             </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
                   正式售價 (NT$) <span className="text-red-500">*</span>
@@ -358,6 +361,20 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   value={salePrice}
                   onChange={(e) => setSalePrice(e.target.value === "" ? "" : Number(e.target.value))}
                   placeholder="可選"
+                  className="w-full text-sm px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
+                  自訂排序
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(Number(e.target.value))}
+                  placeholder="數字越小越前面"
                   className="w-full text-sm px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
                 />
               </div>

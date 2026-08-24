@@ -217,7 +217,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-[#FAF9F6] border border-[#D1C9BC] text-[#2D2D2D] rounded-sm px-2.5 py-1.5 focus:outline-none focus:border-[#7C8B7C]"
             >
-              <option value="custom">自訂寫入排序</option>
+              <option value="custom">自訂排序</option>
               <option value="id-desc">ID 新到舊</option>
               <option value="id-asc">ID 舊到新</option>
               <option value="price-desc">價格：高至低</option>
@@ -263,6 +263,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                   <th className="py-3 px-4">商品名稱與分類</th>
                   <th className="py-3 px-4 text-right">定價 / 特價 (NT$)</th>
                   <th className="py-3 px-4 text-center">庫存狀態</th>
+                  <th className="py-3 px-4 text-center">排序</th>
                   <th className="py-3 px-4 text-center w-36">維護操作</th>
                 </tr>
               </thead>
@@ -346,6 +347,11 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                             </>
                           )}
                         </button>
+                      </td>
+
+                      {/* Sort Order */}
+                      <td className="py-3 px-4 text-center font-mono font-bold text-[#6E6A5E]">
+                        {p.sort_order !== undefined ? p.sort_order : "-"}
                       </td>
 
                       {/* Actions */}
