@@ -14,12 +14,8 @@ import {
   saveProductToFirestore,
   deleteProductFromFirestore,
   saveCategoryToFirestore,
-  deleteCategoryFromFirestore,
-  seedInitialDataToFirestore
+  deleteCategoryFromFirestore
 } from "./lib/firebase";
-
-import initialProductsData from "./data/products.json";
-import initialCategoriesData from "./data/categories.json";
 
 function normalizeProducts(data: unknown): Product[] {
   if (!Array.isArray(data)) return [];
@@ -49,8 +45,8 @@ function normalizeProducts(data: unknown): Product[] {
 }
 
 export default function App() {
-  const [products, setProducts] = useState<Product[]>(() => normalizeProducts(initialProductsData));
-  const [categories, setCategories] = useState<Category[]>(initialCategoriesData as Category[]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Active admin tab
@@ -85,20 +81,8 @@ export default function App() {
         const fsProducts = await fetchProductsFromFirestore();
         const fsCategories = await fetchCategoriesFromFirestore();
 
-        if (fsProducts && fsProducts.length > 0) {
-          setProducts(normalizeProducts(fsProducts));
-        } else {
-          // If empty, fetch local JSON or API and seed to Firestore
-          const loadedProds = normalizeProducts(initialProductsData);
-          const loadedCats = initialCategoriesData as Category[];
-          setProducts(loadedProds);
-          setCategories(loadedCats);
-          await seedInitialDataToFirestore(loadedProds, loadedCats);
-        }
-
-        if (fsCategories && fsCategories.length > 0) {
-          setCategories(fsCategories);
-        }
+        setProducts(normalizeProducts(fsProducts));
+        setCategories(fsCategories);
       } catch (err) {
         console.error("Error loading Firestore data:", err);
       } finally {

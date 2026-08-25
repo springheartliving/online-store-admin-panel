@@ -107,7 +107,6 @@ online-store-admin-panel/
 │       └── deploy.yml          # GitHub Actions 自動部署
 ├── src/
 │   ├── components/             # React 元件
-│   ├── data/                   # 本地 JSON seed 資料
 │   ├── lib/
 │   │   └── firebase.ts         # Firestore CRUD 操作
 │   ├── utils/                  # 工具函式
@@ -129,7 +128,7 @@ online-store-admin-panel/
 
 - **商品管理** — 新增、編輯、刪除、複製商品，管理上架與庫存狀態，自訂排序
 - **分類管理** — 新增、編輯、刪除分類，查看各分類商品數量
-- **Firestore 同步** — 即時讀寫，首次空資料庫自動 seed 本地 JSON
+- **Firestore 資料** — 商品、分類與排序資料統一從 Cloud Firestore 讀寫
 
 ---
 

@@ -124,35 +124,6 @@ export async function deleteCategoryFromFirestore(categoryId: string | number): 
 }
 
 /**
- * Save/seed products and categories to Firestore database
- */
-export async function seedInitialDataToFirestore(
-  products: Product[],
-  categories: Category[]
- ): Promise<void> {
-  try {
-    const batch = writeBatch(db);
- 
-    // Seed products with default sort_order
-    products.forEach((prod, index) => {
-      const docRef = doc(db, PRODUCTS_COLLECTION, String(prod.id));
-      batch.set(docRef, { ...prod, sort_order: prod.sort_order ?? index }, { merge: true });
-    });
- 
-    // Seed categories
-    for (const cat of categories) {
-      const docRef = doc(db, CATEGORIES_COLLECTION, String(cat.id));
-      batch.set(docRef, cat, { merge: true });
-    }
- 
-    await batch.commit();
-    console.log(`Successfully seeded ${products.length} products and ${categories.length} categories to Firestore.`);
-  } catch (error) {
-    console.error("Failed to seed data to Firestore:", error);
-  }
-}
-
-/**
  * Save updated product orders to Firestore in a batch write
  */
 export async function saveProductsOrderToFirestore(orderedProducts: Product[]): Promise<void> {
