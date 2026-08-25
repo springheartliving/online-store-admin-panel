@@ -18,6 +18,7 @@ interface AdminHeaderProps {
   activeTab: AdminTab;
   onTabChange: (tab: AdminTab) => void;
   totalProducts: number;
+  publishedCount: number;
   inStockCount: number;
   totalCategories: number;
   onQuickAddProduct: () => void;
@@ -28,6 +29,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   activeTab,
   onTabChange,
   totalProducts,
+  publishedCount,
   inStockCount,
   totalCategories,
   onQuickAddProduct,
@@ -68,8 +70,13 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             </div>
             <div className="w-px h-6 bg-[#E5E2D9]"></div>
             <div className="text-center">
-              <div className="text-[10px] text-[#8A8576]">上架在庫</div>
+              <div className="text-[10px] text-[#8A8576]">有庫存</div>
               <div className="font-bold text-sm text-emerald-700">{inStockCount}</div>
+            </div>
+            <div className="w-px h-6 bg-[#E5E2D9]"></div>
+            <div className="text-center">
+              <div className="text-[10px] text-[#8A8576]">已上架</div>
+              <div className="font-bold text-sm text-emerald-700">{publishedCount}</div>
             </div>
             <div className="w-px h-6 bg-[#E5E2D9]"></div>
             <div className="text-center">

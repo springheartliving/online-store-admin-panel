@@ -26,8 +26,9 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
   const [slug, setSlug] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [regularPrice, setRegularPrice] = useState<number>(0);
-  const [salePrice, setSalePrice] = useState<number | "">("");
-  const [inStock, setInStock] = useState<boolean>(true);
+  const [isPublished, setIsPublished] = useState<boolean>(true);
+  const [inStock, setInStock] = useState<boolean>(false);
+  const [isOnHot, setIsOnHot] = useState<boolean>(false);
   const [shortDescription, setShortDescription] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   
@@ -59,8 +60,9 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       setSlug(product ? product.slug : "");
       setPrice(product ? product.price : 0);
       setRegularPrice(product ? product.regular_price : 0);
-      setSalePrice(product && product.sale_price ? product.sale_price : "");
-      setInStock(product ? product.in_stock : true);
+      setIsPublished(product ? product.is_published === true : false);
+      setInStock(product ? product.in_stock === true : false);
+      setIsOnHot(product ? Boolean(product.isOnHot) : false);
       setShortDescription(product ? product.short_description : "");
       setSortOrder(product && product.sort_order !== undefined ? product.sort_order : 0);
       
@@ -211,10 +213,8 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       slug: slug.trim() || `product-${id}`,
       price: Number(price) || 0,
       regular_price: Number(regularPrice) || Number(price) || 0,
-      sale_price: salePrice !== "" ? Number(salePrice) : null,
-      isOnSale: salePrice !== "" && Number(salePrice) < (Number(regularPrice) || Number(price)),
-      currency: "TWD",
-      currency_symbol: "NT$",
+      is_published: isPublished,
+      isOnHot,
       in_stock: inStock,
       short_description: shortDescription.trim(),
       description: cleanLines.join("\n"),
@@ -223,7 +223,6 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       tags: mappedTags,
       images: validImages,
       attributes: attributes,
-      has_options: attributes.length > 0,
       sort_order: Number(sortOrder)
     };
 
@@ -320,10 +319,10 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
           {/* Pricing & Stock */}
           <div className="space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#7C8B7C] border-b border-[#E5E2D9] pb-1">
-              價格與庫存狀態
+              價格與上架狀態
             </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
                   正式售價 (NT$) <span className="text-red-500">*</span>
@@ -353,20 +352,6 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-                  優惠特價 (NT$) (無則留空)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={salePrice}
-                  onChange={(e) => setSalePrice(e.target.value === "" ? "" : Number(e.target.value))}
-                  placeholder="可選"
-                  className="w-full text-sm px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
                   自訂排序
                 </label>
                 <input
@@ -384,13 +369,31 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
               <label className="inline-flex items-center cursor-pointer gap-2">
                 <input
                   type="checkbox"
+                  checked={isPublished}
+                  onChange={(e) => setIsPublished(e.target.checked)}
+                  className="w-4 h-4 text-[#7C8B7C] rounded-xs border-[#D1C9BC] focus:ring-[#7C8B7C]"
+                />
+                <span className="text-xs font-semibold text-[#2D2D2D]">
+                  商品上架狀態 (選取為上架，未選取為下架)
+                </span>
+              </label>
+              <label className="inline-flex items-center cursor-pointer gap-2">
+                <input
+                  type="checkbox"
                   checked={inStock}
                   onChange={(e) => setInStock(e.target.checked)}
                   className="w-4 h-4 text-[#7C8B7C] rounded-xs border-[#D1C9BC] focus:ring-[#7C8B7C]"
                 />
-                <span className="text-xs font-semibold text-[#2D2D2D]">
-                  商品上架在庫 (選取為現貨在庫，未選取標示為缺貨/預購)
-                </span>
+                <span className="text-xs font-semibold text-[#2D2D2D]">目前有庫存</span>
+              </label>
+              <label className="inline-flex items-center cursor-pointer gap-2">
+                <input
+                  type="checkbox"
+                  checked={isOnHot}
+                  onChange={(e) => setIsOnHot(e.target.checked)}
+                  className="w-4 h-4 text-[#7C8B7C] rounded-xs border-[#D1C9BC] focus:ring-[#7C8B7C]"
+                />
+                <span className="text-xs font-semibold text-[#2D2D2D]">熱銷推薦</span>
               </label>
             </div>
           </div>

@@ -10,13 +10,15 @@ import {
   FileText,
   Sparkles
 } from "lucide-react";
-import { CartItem, CustomerInfo, Quotation, LineOfficialConfig } from "../types";
+import { CartItem, Category, CustomerInfo, Quotation, LineOfficialConfig } from "../types";
 import { formatNTD, generateQuoteNumber, formatImageUrl } from "../utils/formatters";
+import { getProductCategories } from "../utils/categoryHelpers";
 
 interface QuoteCalculatorProps {
   isOpen: boolean;
   onClose: () => void;
   cart: CartItem[];
+  categories: Category[];
   lineConfig: LineOfficialConfig;
   onUpdateQuantity: (productId: number, newQty: number) => void;
   onRemoveItem: (productId: number) => void;
@@ -31,6 +33,7 @@ export const QuoteCalculator: React.FC<QuoteCalculatorProps> = ({
   isOpen,
   onClose,
   cart,
+  categories,
   lineConfig,
   onUpdateQuantity,
   onRemoveItem,
@@ -70,7 +73,7 @@ export const QuoteCalculator: React.FC<QuoteCalculatorProps> = ({
         sku: item.product.sku,
         price: item.product.price,
         quantity: item.quantity,
-        category: item.product.categories?.[0]?.name || "泉心生活",
+        category: getProductCategories(item.product, categories)[0]?.name || "泉心生活",
         image: formatImageUrl(item.product.images?.[0]?.src),
       })),
       subtotal,
@@ -84,7 +87,7 @@ export const QuoteCalculator: React.FC<QuoteCalculatorProps> = ({
       customer: emptyCustomer,
       status: "draft",
     };
-  }, [cart, subtotal, totalAmount, emptyCustomer]);
+  }, [cart, categories, subtotal, totalAmount, emptyCustomer]);
 
   if (!isOpen) return null;
 

@@ -21,8 +21,35 @@ import {
 import initialProductsData from "./data/products.json";
 import initialCategoriesData from "./data/categories.json";
 
+function normalizeProducts(data: unknown): Product[] {
+  if (!Array.isArray(data)) return [];
+
+  return data.map((item) => {
+    const product = item as Product;
+    return {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      sku: product.sku,
+      price: product.price,
+      regular_price: product.regular_price,
+      is_published: product.is_published === true,
+      isOnHot: product.isOnHot === true,
+      short_description: product.short_description,
+      description: product.description,
+      features: product.features,
+      categories: product.categories,
+      tags: product.tags,
+      images: product.images.map(({ id, src }) => ({ id, src })),
+      attributes: product.attributes,
+      in_stock: product.in_stock === true,
+      sort_order: product.sort_order
+    };
+  });
+}
+
 export default function App() {
-  const [products, setProducts] = useState<Product[]>(initialProductsData as Product[]);
+  const [products, setProducts] = useState<Product[]>(() => normalizeProducts(initialProductsData));
   const [categories, setCategories] = useState<Category[]>(initialCategoriesData as Category[]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -59,10 +86,10 @@ export default function App() {
         const fsCategories = await fetchCategoriesFromFirestore();
 
         if (fsProducts && fsProducts.length > 0) {
-          setProducts(fsProducts);
+          setProducts(normalizeProducts(fsProducts));
         } else {
           // If empty, fetch local JSON or API and seed to Firestore
-          const loadedProds = initialProductsData as Product[];
+          const loadedProds = normalizeProducts(initialProductsData);
           const loadedCats = initialCategoriesData as Category[];
           setProducts(loadedProds);
           setCategories(loadedCats);
@@ -118,12 +145,23 @@ export default function App() {
     }
   };
 
-  const handleToggleStock = async (product: Product) => {
-    const updated = { ...product, in_stock: !product.in_stock };
+  const handleTogglePublished = async (product: Product) => {
+    const updated = { ...product, is_published: product.is_published !== true };
     try {
       await saveProductToFirestore(updated);
       setProducts((prev) => prev.map((p) => (p.id === product.id ? updated : p)));
-      showToast(`商品「${product.name}」已切換為 ${updated.in_stock ? "【上架在庫】" : "【缺貨下架】"}`);
+      showToast(`商品「${product.name}」已切換為 ${updated.is_published ? "【上架】" : "【下架】"}`);
+    } catch (err: any) {
+      showToast(`修改上架狀態失敗: ${err.message}`, "error");
+    }
+  };
+
+  const handleToggleStock = async (product: Product) => {
+    const updated = { ...product, in_stock: product.in_stock !== true };
+    try {
+      await saveProductToFirestore(updated);
+      setProducts((prev) => prev.map((p) => (p.id === product.id ? updated : p)));
+      showToast(`商品「${product.name}」庫存狀態已切換為 ${updated.in_stock ? "【有庫存】" : "【無庫存】"}`);
     } catch (err: any) {
       showToast(`修改庫存狀態失敗: ${err.message}`, "error");
     }
@@ -146,6 +184,24 @@ export default function App() {
   const handleSaveCategory = async (categoryToSave: Category) => {
     try {
       await saveCategoryToFirestore(categoryToSave);
+      const changedProducts = products.filter((product) =>
+        product.categories.some((category) => category.id === categoryToSave.id)
+      ).map((product) => ({
+        ...product,
+        categories: product.categories.map((category) =>
+          category.id === categoryToSave.id
+            ? { id: categoryToSave.id, name: categoryToSave.name, slug: categoryToSave.slug }
+            : category
+        )
+      }));
+
+      if (editingCategory && changedProducts.length > 0) {
+        await Promise.all(changedProducts.map((product) => saveProductToFirestore(product)));
+        setProducts((prev) => prev.map((product) =>
+          changedProducts.find((changedProduct) => changedProduct.id === product.id) ?? product
+        ));
+      }
+
       setCategories((prev) => {
         const existingIdx = prev.findIndex((c) => c.id === categoryToSave.id);
         if (existingIdx >= 0) {
@@ -178,7 +234,8 @@ export default function App() {
     }
   };
 
-  const inStockCount = useMemo(() => products.filter((p) => p.in_stock).length, [products]);
+  const publishedCount = useMemo(() => products.filter((p) => p.is_published).length, [products]);
+  const inStockCount = useMemo(() => products.filter((p) => p.in_stock === true).length, [products]);
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] text-[#2D2D2D] font-sans antialiased flex flex-col">
@@ -206,6 +263,7 @@ export default function App() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         totalProducts={products.length}
+        publishedCount={publishedCount}
         inStockCount={inStockCount}
         totalCategories={categories.length}
         onQuickAddProduct={() => {
@@ -243,6 +301,7 @@ export default function App() {
                 }}
                 onDuplicateProduct={handleDuplicateProduct}
                 onDeleteProduct={handleDeleteProduct}
+                onTogglePublished={handleTogglePublished}
                 onToggleStock={handleToggleStock}
                 onOpenReorder={() => setIsReorderModalOpen(true)}
               />

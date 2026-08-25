@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { Product, Category } from "../types";
 import { formatNTD, formatImageUrl } from "../utils/formatters";
+import { getProductCategories } from "../utils/categoryHelpers";
 
 interface ProductManagementProps {
   products: Product[];
@@ -28,6 +29,7 @@ interface ProductManagementProps {
   onEditProduct: (product: Product) => void;
   onDuplicateProduct: (product: Product) => void;
   onDeleteProduct: (productId: number) => void;
+  onTogglePublished: (product: Product) => void;
   onToggleStock: (product: Product) => void;
   onOpenReorder: () => void;
 }
@@ -39,11 +41,13 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
   onEditProduct,
   onDuplicateProduct,
   onDeleteProduct,
+  onTogglePublished,
   onToggleStock,
   onOpenReorder,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [publishFilter, setPublishFilter] = useState<"all" | "published" | "unpublished">("all");
   const [stockFilter, setStockFilter] = useState<"all" | "in_stock" | "out_of_stock">("all");
   const [sortBy, setSortBy] = useState<"custom" | "id-desc" | "id-asc" | "price-desc" | "price-asc" | "name">("custom");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
@@ -60,7 +64,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
           p.name.toLowerCase().includes(q) ||
           p.sku.toLowerCase().includes(q) ||
           p.short_description.toLowerCase().includes(q) ||
-          p.categories.some((c) => c.name.toLowerCase().includes(q))
+          getProductCategories(p, categories).some((c) => c.name.toLowerCase().includes(q))
       );
     }
 
@@ -68,16 +72,22 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
     if (selectedCategory !== "all") {
       result = result.filter((p) =>
         p.categories.some(
-          (c) => String(c.id) === selectedCategory || c.slug === selectedCategory
+          (c) => String(c.id) === selectedCategory
         )
       );
     }
 
-    // Stock status filter
+    // Publication status filter
+    if (publishFilter === "published") {
+      result = result.filter((p) => p.is_published);
+    } else if (publishFilter === "unpublished") {
+      result = result.filter((p) => !p.is_published);
+    }
+
     if (stockFilter === "in_stock") {
-      result = result.filter((p) => p.in_stock);
+      result = result.filter((p) => p.in_stock === true);
     } else if (stockFilter === "out_of_stock") {
-      result = result.filter((p) => !p.in_stock);
+      result = result.filter((p) => p.in_stock !== true);
     }
 
     // Sorting
@@ -96,7 +106,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
     });
 
     return result;
-  }, [products, searchQuery, selectedCategory, stockFilter, sortBy]);
+  }, [products, categories, searchQuery, selectedCategory, publishFilter, stockFilter, sortBy]);
 
   return (
     <div className="space-y-6">
@@ -198,13 +208,27 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
             <Filter className="w-3.5 h-3.5 text-[#8A8576]" />
             <span className="font-semibold text-[#6E6A5E]">狀態：</span>
             <select
-              value={stockFilter}
-              onChange={(e) => setStockFilter(e.target.value as any)}
+              value={publishFilter}
+              onChange={(e) => setPublishFilter(e.target.value as typeof publishFilter)}
               className="bg-[#FAF9F6] border border-[#D1C9BC] text-[#2D2D2D] rounded-sm px-2.5 py-1.5 focus:outline-none focus:border-[#7C8B7C]"
             >
               <option value="all">全部狀態</option>
-              <option value="in_stock">上架在庫</option>
-              <option value="out_of_stock">缺貨 / 暫停下架</option>
+              <option value="published">已上架</option>
+              <option value="unpublished">已下架</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <PackageCheck className="w-3.5 h-3.5 text-[#8A8576]" />
+            <span className="font-semibold text-[#6E6A5E]">庫存：</span>
+            <select
+              value={stockFilter}
+              onChange={(e) => setStockFilter(e.target.value as typeof stockFilter)}
+              className="bg-[#FAF9F6] border border-[#D1C9BC] text-[#2D2D2D] rounded-sm px-2.5 py-1.5 focus:outline-none focus:border-[#7C8B7C]"
+            >
+              <option value="all">全部庫存</option>
+              <option value="in_stock">有庫存</option>
+              <option value="out_of_stock">無庫存</option>
             </select>
           </div>
 
@@ -244,6 +268,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
             onClick={() => {
               setSearchQuery("");
               setSelectedCategory("all");
+              setPublishFilter("all");
               setStockFilter("all");
             }}
             className="px-4 py-2 bg-[#FAF9F6] hover:bg-[#EAE7DC] text-[#2D2D2D] text-xs font-medium rounded-sm border border-[#D1C9BC] cursor-pointer transition"
@@ -262,6 +287,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                   <th className="py-3 px-4">ID / SKU</th>
                   <th className="py-3 px-4">商品名稱與分類</th>
                   <th className="py-3 px-4 text-right">定價 / 特價 (NT$)</th>
+                  <th className="py-3 px-4 text-center">上架狀態</th>
                   <th className="py-3 px-4 text-center">庫存狀態</th>
                   <th className="py-3 px-4 text-center">排序</th>
                   <th className="py-3 px-4 text-center w-36">維護操作</th>
@@ -301,7 +327,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                           {p.name}
                         </div>
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {p.categories.map((c) => (
+                          {getProductCategories(p, categories).map((c) => (
                             <span
                               key={c.id}
                               className="px-1.5 py-0.5 bg-[#FAF9F6] text-[#7C8B7C] border border-[#E5E2D9] text-[10px] rounded-xs font-medium"
@@ -317,7 +343,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                         <div className="font-bold text-sm text-[#2D2D2D]">
                           {formatNTD(p.price)}
                         </div>
-                        {p.sale_price && p.sale_price < p.regular_price && (
+                        {p.regular_price > p.price && (
                           <div className="text-[10px] text-[#8A8576] line-through">
                             原價 {formatNTD(p.regular_price)}
                           </div>
@@ -327,25 +353,40 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                       {/* Stock Status Switch */}
                       <td className="py-3 px-4 text-center">
                         <button
-                          onClick={() => onToggleStock(p)}
+                          onClick={() => onTogglePublished(p)}
                           className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition cursor-pointer ${
-                            p.in_stock
+                            p.is_published
                               ? "bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200"
                               : "bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200"
                           }`}
-                          title="點擊切換庫存狀態"
+                          title="點擊切換上架狀態"
                         >
-                          {p.in_stock ? (
+                          {p.is_published ? (
                             <>
                               <PackageCheck className="w-3.5 h-3.5" />
-                              <span>上架在庫</span>
+                              <span>已上架</span>
                             </>
                           ) : (
                             <>
                               <PackageX className="w-3.5 h-3.5" />
-                              <span>缺貨下架</span>
+                              <span>已下架</span>
                             </>
                           )}
+                        </button>
+                      </td>
+
+                      <td className="py-3 px-4 text-center">
+                        <button
+                          onClick={() => onToggleStock(p)}
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition cursor-pointer ${
+                            p.in_stock === true
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200"
+                              : "bg-slate-100 text-slate-700 border border-slate-300 hover:bg-slate-200"
+                          }`}
+                          title="點擊切換庫存狀態"
+                        >
+                          {p.in_stock === true ? <PackageCheck className="w-3.5 h-3.5" /> : <PackageX className="w-3.5 h-3.5" />}
+                          <span>{p.in_stock === true ? "有庫存" : "無庫存"}</span>
                         </button>
                       </td>
 
@@ -416,16 +457,30 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                     </span>
                   </div>
                   <div className="absolute top-2 right-2">
-                    <button
-                      onClick={() => onToggleStock(p)}
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold border shadow-xs cursor-pointer ${
-                        p.in_stock
-                          ? "bg-emerald-600 text-white border-emerald-500"
-                          : "bg-amber-600 text-white border-amber-500"
-                      }`}
-                    >
-                      {p.in_stock ? "在售" : "缺貨"}
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => onTogglePublished(p)}
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold border shadow-xs cursor-pointer ${
+                          p.is_published
+                            ? "bg-emerald-600 text-white border-emerald-500"
+                            : "bg-amber-600 text-white border-amber-500"
+                        }`}
+                        title="切換上架狀態"
+                      >
+                        {p.is_published ? "已上架" : "已下架"}
+                      </button>
+                      <button
+                        onClick={() => onToggleStock(p)}
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold border shadow-xs cursor-pointer ${
+                          p.in_stock === true
+                            ? "bg-sky-600 text-white border-sky-500"
+                            : "bg-slate-600 text-white border-slate-500"
+                        }`}
+                        title="切換庫存狀態"
+                      >
+                        {p.in_stock === true ? "有庫存" : "無庫存"}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -433,7 +488,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                 <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                   <div>
                     <div className="flex items-center gap-1 flex-wrap text-[10px] text-[#7C8B7C] font-semibold mb-1">
-                      {p.categories.map((c) => (
+                      {getProductCategories(p, categories).map((c) => (
                         <span key={c.id}>• {c.name}</span>
                       ))}
                     </div>

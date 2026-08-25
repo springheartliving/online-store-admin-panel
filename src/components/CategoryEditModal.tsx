@@ -20,7 +20,6 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
   const [id, setId] = useState<number>(0);
   const [name, setName] = useState<string>("");
   const [slug, setSlug] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -30,7 +29,6 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
       setId(category ? category.id : Date.now());
       setName(category ? category.name : "");
       setSlug(category ? category.slug : "");
-      setDescription(category && category.description ? category.description : "");
       setIsSubmitting(false);
       setErrorMsg(null);
     }
@@ -56,7 +54,6 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
       id: Number(id),
       name: name.trim(),
       slug: slug.trim() || `category-${id}`,
-      description: description.trim()
     };
 
     try {
@@ -124,19 +121,6 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
               onChange={(e) => setSlug(e.target.value)}
               placeholder="例如：spa-bubble-equipment"
               className="w-full text-xs px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-              分類描述 / 說明 (選填)
-            </label>
-            <textarea
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="簡單說明此分類主要涵蓋的商品項目與保養類型..."
-              className="w-full text-xs px-3 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
             />
           </div>
 

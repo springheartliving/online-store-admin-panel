@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Plus, Check, Eye, Sparkles, Layers } from "lucide-react";
-import { Product } from "../types";
+import { Category, Product } from "../types";
 import { formatNTD, formatImageUrl } from "../utils/formatters";
+import { getProductCategories } from "../utils/categoryHelpers";
 
 interface ProductCardProps {
   product: Product;
+  categories: Category[];
   inCartCount: number;
   onAddToCart: (product: Product, quantity: number) => void;
   onQuickView: (product: Product) => void;
@@ -12,6 +14,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
+  categories,
   inCartCount,
   onAddToCart,
   onQuickView,
@@ -28,7 +31,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const imageSrc = formatImageUrl(product.images?.[0]?.src);
-  const primaryCategory = product.categories?.[0]?.name || "養生美學";
+  const primaryCategory = getProductCategories(product, categories)[0]?.name || "養生美學";
 
   return (
     <div
@@ -63,7 +66,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <span className="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-xs bg-white/90 backdrop-blur-xs text-[#7C8B7C] border border-[#E5E2D9]">
               {primaryCategory}
             </span>
-            {product.isOnSale && (
+            {product.isOnHot && (
               <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-xs bg-[#2D2D2D] text-white">
                 熱銷推薦
               </span>
