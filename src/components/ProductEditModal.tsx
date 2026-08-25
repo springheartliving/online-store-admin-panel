@@ -246,7 +246,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
         <div className="px-6 py-4 bg-[#FAF9F6] border-b border-[#E5E2D9] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#7C8B7C]"></span>
-            <h3 className="font-serif font-bold text-lg text-[#2D2D2D]">
+            <h3 className="font-light font-bold text-lg text-[#2D2D2D]">
               {isEditing ? `編輯商品 #${id}` : "新增商品維護"}
             </h3>
           </div>

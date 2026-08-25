@@ -76,7 +76,7 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
         <div className="px-5 py-4 bg-[#FAF9F6] border-b border-[#E5E2D9] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Tag className="w-4 h-4 text-[#7C8B7C]" />
-            <h3 className="font-serif font-bold text-base text-[#2D2D2D]">
+            <h3 className="font-light font-bold text-base text-[#2D2D2D]">
               {isEditing ? `編輯分類 #${id}` : "新增商品分類"}
             </h3>
           </div>

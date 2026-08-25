@@ -134,4 +134,4 @@ online-store-admin-panel/
 
 ## License
 
-Private — 泉心生活 Spring Heart Living © 2025
+Private — 泉心生活 Spring Heart Living © 2026

@@ -115,7 +115,7 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-[#E5E2D9] flex items-center justify-between bg-[#FAF9F6]">
           <div>
-            <h3 className="text-base sm:text-lg font-serif font-bold text-[#2D2D2D] flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-light font-bold text-[#2D2D2D] flex items-center gap-2">
               <Move className="w-5 h-5 text-[#7C8B7C]" />
               商品自訂排序維護
             </h3>

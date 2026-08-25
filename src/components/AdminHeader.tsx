@@ -49,7 +49,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-serif font-bold text-lg sm:text-xl tracking-tight text-[#2D2D2D]">
+                <h1 className="font-mono font-bold text-lg sm:text-xl tracking-tight text-[#2D2D2D]">
                   泉心生活
                 </h1>
                 <span className="px-2 py-0.5 bg-[#2E4F2D] text-white font-mono font-bold text-[10px] rounded-xs uppercase tracking-wider">
@@ -70,14 +70,14 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             </div>
             <div className="w-px h-6 bg-[#E5E2D9]"></div>
             <div className="text-center">
-              <div className="text-[10px] text-[#8A8576]">有庫存</div>
-              <div className="font-bold text-sm text-emerald-700">{inStockCount}</div>
-            </div>
-            <div className="w-px h-6 bg-[#E5E2D9]"></div>
-            <div className="text-center">
               <div className="text-[10px] text-[#8A8576]">已上架</div>
               <div className="font-bold text-sm text-emerald-700">{publishedCount}</div>
             </div>
+            <div className="w-px h-6 bg-[#E5E2D9]"></div>
+            <div className="text-center">
+              <div className="text-[10px] text-[#8A8576]">有庫存</div>
+              <div className="font-bold text-sm text-emerald-700">{inStockCount}</div>
+            </div>            
             <div className="w-px h-6 bg-[#E5E2D9]"></div>
             <div className="text-center">
               <div className="text-[10px] text-[#8A8576]">商品分類</div>
