@@ -290,7 +290,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-                  SKU 編號 / 型號
+                  SKU
                 </label>
                 <input
                   type="text"
@@ -303,7 +303,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-                  網址 Slug
+                  Slug
                 </label>
                 <input
                   type="text"
@@ -325,7 +325,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-                  正式售價 (NT$) <span className="text-red-500">*</span>
+                  售價 (NT$) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -339,7 +339,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-                  原價 / 建議售價 (NT$)
+                  定價 (NT$)
                 </label>
                 <input
                   type="number"
@@ -374,7 +374,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   className="w-4 h-4 text-[#7C8B7C] rounded-xs border-[#D1C9BC] focus:ring-[#7C8B7C]"
                 />
                 <span className="text-xs font-semibold text-[#2D2D2D]">
-                  商品上架狀態 (選取為上架，未選取為下架)
+                  上架
                 </span>
               </label>
               <label className="inline-flex items-center cursor-pointer gap-2">
@@ -384,7 +384,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   onChange={(e) => setInStock(e.target.checked)}
                   className="w-4 h-4 text-[#7C8B7C] rounded-xs border-[#D1C9BC] focus:ring-[#7C8B7C]"
                 />
-                <span className="text-xs font-semibold text-[#2D2D2D]">目前有庫存</span>
+                <span className="text-xs font-semibold text-[#2D2D2D]">有庫存</span>
               </label>
               <label className="inline-flex items-center cursor-pointer gap-2">
                 <input
@@ -401,7 +401,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
           {/* Categories */}
           <div className="space-y-2">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#7C8B7C] border-b border-[#E5E2D9] pb-1">
-              所屬商品分類 <span className="text-red-500">*</span>
+              商品分類 <span className="text-red-500">*</span>
             </h4>
             <div className="flex flex-wrap gap-2 pt-1">
               {categories.map((cat) => {
@@ -550,17 +550,17 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-                詳細商品說明 (每行換行將自動視為一個項目，不需手動輸入 "• " 符號)
+                詳細商品說明 (每行換行將自動視為一個項目)
               </label>
               <textarea
                 rows={6}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="在此直接輸入商品特色，每一行換行會自動成為獨立項目。例如：
+                placeholder="在此直接輸入商品特色，每一行換行會自動成為獨立項目。
+例如：
 100% 天然精油調和
 溫和配方，敏感肌適用
-通過專利超音波低溫冷萃技術
-(不需自行加點，系統會自動在載入時移除舊有的 '• '，前台展示時會自動加上圓點標記)"
+通過專利超音波低溫冷萃技術"
                 className="w-full text-xs px-3 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C] leading-relaxed"
               />
             </div>

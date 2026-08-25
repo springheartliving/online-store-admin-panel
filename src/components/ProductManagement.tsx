@@ -123,7 +123,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="搜尋商品名稱、SKU/型號、成分簡介..."
+              placeholder="搜尋商品名稱、SKU、成分簡介..."
               className="w-full bg-[#FAF9F6] text-xs sm:text-sm text-[#2D2D2D] placeholder-[#8A8576] pl-10 pr-8 py-2.5 rounded-sm border border-[#D1C9BC] focus:outline-none focus:border-[#7C8B7C] focus:bg-white transition"
             />
             {searchQuery && (
@@ -286,7 +286,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                   <th className="py-3 px-4 w-16">縮圖</th>
                   <th className="py-3 px-4">ID / SKU</th>
                   <th className="py-3 px-4">商品名稱與分類</th>
-                  <th className="py-3 px-4 text-right">定價 / 特價 (NT$)</th>
+                  <th className="py-3 px-4 text-right">售價 / 定價 (NT$)</th>
                   <th className="py-3 px-4 text-center">上架狀態</th>
                   <th className="py-3 px-4 text-center">庫存狀態</th>
                   <th className="py-3 px-4 text-center">排序</th>
@@ -345,7 +345,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                         </div>
                         {p.regular_price > p.price && (
                           <div className="text-[10px] text-[#8A8576] line-through">
-                            原價 {formatNTD(p.regular_price)}
+                            定價 {formatNTD(p.regular_price)}
                           </div>
                         )}
                       </td>

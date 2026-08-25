@@ -108,7 +108,7 @@ export const CategoryManagement: React.FC<CategoryManagementProps> = ({
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="font-bold text-sm text-[#2D2D2D] flex items-center gap-1.5">
-                          <Tag className="w-3.5 h-3.5 text-[#7C8B7C]" />
+                          {/* <Tag className="w-3.5 h-3.5 text-[#7C8B7C]" /> */}
                           <span>{c.name}</span>
                         </div>
                       </td>

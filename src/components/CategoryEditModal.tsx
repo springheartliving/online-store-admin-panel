@@ -99,7 +99,7 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
 
           <div>
             <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-              分類名稱 <span className="text-red-500">*</span>
+              名稱 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -113,7 +113,7 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
 
           <div>
             <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-              分類 Slug (代碼)
+              Slug
             </label>
             <input
               type="text"

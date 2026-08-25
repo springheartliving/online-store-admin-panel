@@ -50,14 +50,14 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="font-serif font-bold text-lg sm:text-xl tracking-tight text-[#2D2D2D]">
-                  泉心生活 Spring Heart Living
+                  泉心生活
                 </h1>
                 <span className="px-2 py-0.5 bg-[#2E4F2D] text-white font-mono font-bold text-[10px] rounded-xs uppercase tracking-wider">
                   後台維護
                 </span>
               </div>
               <p className="text-[11px] text-[#8A8576] tracking-wide font-light hidden sm:block">
-                商品與分類資料庫維護系統 (Firestore Cloud Sync)
+                Spring Heart Living
               </p>
             </div>
           </div>
