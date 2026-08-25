@@ -1,7 +1,7 @@
 # Online Store Admin Panel
 **泉心生活 Spring Heart Living — 商品後台管理系統**
 
-管理員後台，用於管理 Firestore 資料庫中的商品、分類與報價單。
+管理員後台，用於管理 Firestore 資料庫中的商品與分類。
 
 ---
 
@@ -27,15 +27,9 @@
 npm install
 ```
 
-### 2. 設定環境變數（可選）
+### 2. Firebase 設定
 
-如需使用 LINE Notify 功能，複製 `.env.example` 並填入對應值：
-
-```bash
-cp .env.example .env
-```
-
-> Firebase 設定已硬編碼於 `firebase-applet-config.json`，不需要額外設定。
+Firebase 設定已硬編碼於 `firebase-applet-config.json`，不需要額外設定。
 
 ### 3. 啟動開發伺服器
 
@@ -98,7 +92,6 @@ npm run preview
 |------------|------|
 | `products` | 商品資料（含 `sort_order` 排序欄位）|
 | `categories` | 商品分類 |
-| `quotations` | 報價單 / 估價紀錄 |
 
 Firebase Project ID: `primeval-ellipse-39brs`  
 Firestore Database: `ai-studio-springheartlivin-f2a957a1-914f-42f7-afd3-33224e63e709`
@@ -134,9 +127,8 @@ online-store-admin-panel/
 
 ## 功能說明
 
-- **商品管理** — 新增、編輯、刪除、複製商品，切換上架/缺貨狀態，自訂排序
+- **商品管理** — 新增、編輯、刪除、複製商品，管理上架與庫存狀態，自訂排序
 - **分類管理** — 新增、編輯、刪除分類，查看各分類商品數量
-- **報價計算機** — 選品、填寫客戶資料、產生估價單，支援 LINE Notify 通知
 - **Firestore 同步** — 即時讀寫，首次空資料庫自動 seed 本地 JSON
 
 ---

@@ -1,80 +1,25 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
 import {
   getFirestore,
   collection,
   doc,
   getDocs,
-  getDoc,
   setDoc,
   deleteDoc,
-  query,
-  orderBy,
-  limit,
   writeBatch
 } from "firebase/firestore";
 import firebaseConfig from "../../firebase-applet-config.json";
-import { Product, Category, Quotation } from "../types";
+import { Product, Category } from "../types";
 
 // Initialize Firebase App
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Get Firestore instance using the specific databaseId specified in config
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId || "(default)");
-export const auth = getAuth(app);
 
 // Collections references
 const PRODUCTS_COLLECTION = "products";
 const CATEGORIES_COLLECTION = "categories";
-const QUOTATIONS_COLLECTION = "quotations";
-
-export enum OperationType {
-  CREATE = 'create',
-  UPDATE = 'update',
-  DELETE = 'delete',
-  LIST = 'list',
-  GET = 'get',
-  WRITE = 'write',
-}
-
-export interface FirestoreErrorInfo {
-  error: string;
-  operationType: OperationType;
-  path: string | null;
-  authInfo: {
-    userId?: string | null;
-    email?: string | null;
-    emailVerified?: boolean | null;
-    isAnonymous?: boolean | null;
-    tenantId?: string | null;
-    providerInfo?: {
-      providerId?: string | null;
-      email?: string | null;
-    }[];
-  };
-}
-
-export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
-  const errInfo: FirestoreErrorInfo = {
-    error: error instanceof Error ? error.message : String(error),
-    authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-      tenantId: auth.currentUser?.tenantId,
-      providerInfo: auth.currentUser?.providerData?.map(provider => ({
-        providerId: provider.providerId,
-        email: provider.email,
-      })) || []
-    },
-    operationType,
-    path
-  };
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
-}
-
 /**
  * Fetch all products from Firestore database
  */
@@ -222,62 +167,5 @@ export async function saveProductsOrderToFirestore(orderedProducts: Product[]): 
   } catch (error) {
     console.error("Failed to save product ordering to Firestore:", error);
     throw error;
-  }
-}
-
-/**
- * Fetch historical quotation orders from Firestore
- */
-export async function fetchQuotationsFromFirestore(): Promise<Quotation[]> {
-  try {
-    const colRef = collection(db, QUOTATIONS_COLLECTION);
-    const q = query(colRef, orderBy("createdAt", "desc"), limit(100));
-    const snapshot = await getDocs(q);
-    const quotations: Quotation[] = [];
-    snapshot.forEach((docSnap) => {
-      quotations.push(docSnap.data() as Quotation);
-    });
-    return quotations;
-  } catch (error) {
-    console.error("Failed to fetch quotations from Firestore:", error);
-    // Fallback if index not ready
-    try {
-      const colRef = collection(db, QUOTATIONS_COLLECTION);
-      const snapshot = await getDocs(colRef);
-      const list: Quotation[] = [];
-      snapshot.forEach((docSnap) => list.push(docSnap.data() as Quotation));
-      return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    } catch {
-      return [];
-    }
-  }
-}
-
-/**
- * Save a new or updated quotation order to Firestore database
- */
-export async function saveQuotationToFirestore(quotation: Quotation): Promise<void> {
-  try {
-    const docRef = doc(db, QUOTATIONS_COLLECTION, quotation.quoteNo);
-    await setDoc(docRef, {
-      ...quotation,
-      updatedAt: new Date().toISOString()
-    }, { merge: true });
-    console.log(`Quotation ${quotation.quoteNo} saved to Firestore.`);
-  } catch (error) {
-    console.error("Failed to save quotation to Firestore:", error);
-  }
-}
-
-/**
- * Delete a quotation record from Firestore
- */
-export async function deleteQuotationFromFirestore(quoteNo: string): Promise<void> {
-  try {
-    const docRef = doc(db, QUOTATIONS_COLLECTION, quoteNo);
-    await deleteDoc(docRef);
-    console.log(`Quotation ${quoteNo} deleted from Firestore.`);
-  } catch (error) {
-    console.error("Failed to delete quotation from Firestore:", error);
   }
 }
