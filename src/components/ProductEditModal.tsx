@@ -319,7 +319,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
           {/* Pricing & Stock */}
           <div className="space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#7C8B7C] border-b border-[#E5E2D9] pb-1">
-              價格與上架狀態
+              價格與狀態
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
