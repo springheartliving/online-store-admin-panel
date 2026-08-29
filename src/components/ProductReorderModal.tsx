@@ -65,8 +65,13 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
     setDragPointer(null);
   };
 
+  const isDragAllowedTarget = (target: EventTarget | null) => {
+    if (!(target instanceof Element)) return true;
+    return !target.closest("[data-no-drag='true']");
+  };
+
   const beginDrag = (event: React.PointerEvent<HTMLDivElement>, productId: number) => {
-    if (searchQuery || localProducts.length < 2) return;
+    if (searchQuery || localProducts.length < 2 || !isDragAllowedTarget(event.target)) return;
 
     event.preventDefault();
     event.stopPropagation();
@@ -304,9 +309,14 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
                     </div>
 
                     {/* Controls (Action Buttons) */}
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div
+                      data-no-drag="true"
+                      onPointerDown={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1 shrink-0"
+                    >
                       {/* Top */}
                       <button
+                        data-no-drag="true"
                         onClick={() => moveItem(originalIndex, "top")}
                         disabled={isFirst || !!searchQuery}
                         className="p-1.5 text-[#6E6A5E] hover:bg-white hover:text-[#2D2D2D] border border-transparent hover:border-[#D1C9BC] rounded-sm transition disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:border-transparent cursor-pointer"
@@ -317,6 +327,7 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
 
                       {/* Up */}
                       <button
+                        data-no-drag="true"
                         onClick={() => moveItem(originalIndex, "up")}
                         disabled={isFirst || !!searchQuery}
                         className="p-1.5 text-[#6E6A5E] hover:bg-white hover:text-[#2D2D2D] border border-transparent hover:border-[#D1C9BC] rounded-sm transition disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:border-transparent cursor-pointer"
@@ -327,6 +338,7 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
 
                       {/* Down */}
                       <button
+                        data-no-drag="true"
                         onClick={() => moveItem(originalIndex, "down")}
                         disabled={isLast || !!searchQuery}
                         className="p-1.5 text-[#6E6A5E] hover:bg-white hover:text-[#2D2D2D] border border-transparent hover:border-[#D1C9BC] rounded-sm transition disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:border-transparent cursor-pointer"
@@ -337,6 +349,7 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
 
                       {/* Bottom */}
                       <button
+                        data-no-drag="true"
                         onClick={() => moveItem(originalIndex, "bottom")}
                         disabled={isLast || !!searchQuery}
                         className="p-1.5 text-[#6E6A5E] hover:bg-white hover:text-[#2D2D2D] border border-transparent hover:border-[#D1C9BC] rounded-sm transition disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:border-transparent cursor-pointer"
