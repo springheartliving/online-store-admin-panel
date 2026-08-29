@@ -3,6 +3,32 @@ import { X, Plus, Trash2, Image as ImageIcon, Tag, Check, AlertCircle, ArrowLeft
 import { Product, Category, ProductImage, ProductAttribute } from "../types";
 import { formatImageUrl } from "../utils/formatters";
 
+const ProductImageFallback: React.FC<{
+  src?: string;
+  alt: string;
+  className?: string;
+  fallbackClassName?: string;
+}> = ({ src, alt, className = "", fallbackClassName = "" }) => {
+  const [hasError, setHasError] = useState(false);
+
+  if (!src || hasError) {
+    return (
+      <div className={fallbackClassName || "w-full h-full flex items-center justify-center bg-[#FAF9F6] text-[#8A8576]"}>
+        <ImageIcon className="w-5 h-5" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={formatImageUrl(src)}
+      alt={alt}
+      className={className}
+      onError={() => setHasError(true)}
+    />
+  );
+};
+
 interface ProductEditModalProps {
   isOpen: boolean;
   product: Product | null; // null means adding a new product
@@ -454,20 +480,12 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                 <div key={img.id || idx} className="relative group border border-[#E5E2D9] rounded-sm p-1.5 bg-[#FAF9F6] flex flex-col justify-between min-h-[175px]">
                   <div>
                     <div className="relative h-24 bg-[#EAE7DC] rounded-xs overflow-hidden">
-                      {img.src ? (
-                        <img
-                          src={formatImageUrl(img.src)}
-                          alt={img.alt || name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=400";
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[#8A8576]">
-                          <ImageIcon className="w-6 h-6" />
-                        </div>
-                      )}
+                      <ProductImageFallback
+                        src={img.src}
+                        alt={img.alt || name}
+                        className="w-full h-full object-cover"
+                        fallbackClassName="w-full h-full flex items-center justify-center text-[#8A8576]"
+                      />
                       
                       {/* 顯示目前圖片順序編號 */}
                       <span className="absolute top-1 left-1 bg-[#2D2D2D]/85 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-bold shadow-sm">

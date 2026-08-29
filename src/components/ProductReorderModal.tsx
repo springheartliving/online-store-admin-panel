@@ -8,7 +8,8 @@ import {
   RefreshCw,
   Save,
   Check,
-  Move
+  Move,
+  Image as ImageIcon
 } from "lucide-react";
 import { Product } from "../types";
 import { saveProductsOrderToFirestore, fetchProductsFromFirestore } from "../lib/firebase";
@@ -19,6 +20,32 @@ interface ProductReorderModalProps {
   onClose: () => void;
   onSaveSuccess: (updatedProducts: Product[]) => void;
 }
+
+const ProductImageFallback: React.FC<{
+  src?: string;
+  alt: string;
+  className?: string;
+  fallbackClassName?: string;
+}> = ({ src, alt, className = "", fallbackClassName = "" }) => {
+  const [hasError, setHasError] = useState(false);
+
+  if (!src || hasError) {
+    return (
+      <div className={fallbackClassName || "w-full h-full flex items-center justify-center bg-[#FAF9F6] text-[#8A8576]"}>
+        <ImageIcon className="w-5 h-5" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={formatImageUrl(src)}
+      alt={alt}
+      className={className}
+      onError={() => setHasError(true)}
+    />
+  );
+};
 
 export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
   isOpen,
@@ -232,9 +259,7 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
           ) : (
             <div className="space-y-1.5">
               {filteredProducts.map(({ product, originalIndex }) => {
-                const mainImage = product.images && product.images[0]?.src
-                  ? formatImageUrl(product.images[0].src)
-                  : "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=200";
+                const mainImage = product.images && product.images[0]?.src ? product.images[0].src : "";
 
                 const isFirst = originalIndex === 0;
                 const isLast = originalIndex === localProducts.length - 1;
@@ -260,13 +285,11 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
 
                     {/* Image */}
                     <div className="w-10 h-10 bg-[#FAF9F6] border border-[#E5E2D9] rounded-sm overflow-hidden shrink-0">
-                      <img 
-                        src={mainImage} 
-                        alt={product.name} 
+                      <ProductImageFallback
+                        src={mainImage}
+                        alt={product.name}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=200";
-                        }}
+                        fallbackClassName="w-full h-full flex items-center justify-center bg-[#FAF9F6] text-[#8A8576]"
                       />
                     </div>
 
@@ -347,14 +370,11 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
             >
               <div className="flex items-center gap-3 p-2.5">
                 <div className="w-10 h-10 bg-[#FAF9F6] border border-[#E5E2D9] rounded-sm overflow-hidden shrink-0">
-                  <img
-                    src={
-                      localProducts.find((product) => product.id === draggedProductId)?.images?.[0]?.src
-                        ? formatImageUrl(localProducts.find((product) => product.id === draggedProductId)!.images![0].src)
-                        : "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=200"
-                    }
+                  <ProductImageFallback
+                    src={localProducts.find((product) => product.id === draggedProductId)?.images?.[0]?.src || ""}
                     alt={localProducts.find((product) => product.id === draggedProductId)?.name || "drag item"}
                     className="w-full h-full object-cover"
+                    fallbackClassName="w-full h-full flex items-center justify-center bg-[#FAF9F6] text-[#8A8576]"
                   />
                 </div>
                 <div className="min-w-0 flex-1">

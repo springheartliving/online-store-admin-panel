@@ -16,7 +16,8 @@ import {
   PackageCheck,
   PackageX,
   Sparkles,
-  Move
+  Move,
+  Image as ImageIcon
 } from "lucide-react";
 import { Product, Category } from "../types";
 import { formatNTD, formatImageUrl } from "../utils/formatters";
@@ -33,6 +34,32 @@ interface ProductManagementProps {
   onToggleStock: (product: Product) => void;
   onOpenReorder: () => void;
 }
+
+const ProductImageFallback: React.FC<{
+  src?: string;
+  alt: string;
+  className?: string;
+  fallbackClassName?: string;
+}> = ({ src, alt, className = "", fallbackClassName = "" }) => {
+  const [hasError, setHasError] = useState(false);
+
+  if (!src || hasError) {
+    return (
+      <div className={fallbackClassName || "w-full h-full flex items-center justify-center bg-[#FAF9F6] text-[#8A8576]"}>
+        <ImageIcon className="w-5 h-5" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={formatImageUrl(src)}
+      alt={alt}
+      className={className}
+      onError={() => setHasError(true)}
+    />
+  );
+};
 
 export const ProductManagement: React.FC<ProductManagementProps> = ({
   products,
@@ -295,22 +322,18 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
               </thead>
               <tbody className="divide-y divide-[#E5E2D9]">
                 {filteredProducts.map((p) => {
-                  const mainImage = p.images && p.images[0]?.src
-                    ? formatImageUrl(p.images[0].src)
-                    : "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=200";
+                  const mainImage = p.images && p.images[0]?.src ? p.images[0].src : "";
 
                   return (
                     <tr key={p.id} className="hover:bg-[#FAF8F5] transition-colors">
                       {/* Image */}
                       <td className="py-3 px-4">
                         <div className="w-11 h-11 bg-[#FAF9F6] border border-[#E5E2D9] rounded-sm overflow-hidden shrink-0">
-                          <img
+                          <ProductImageFallback
                             src={mainImage}
                             alt={p.name}
                             className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=200";
-                            }}
+                            fallbackClassName="w-full h-full flex items-center justify-center bg-[#FAF9F6] text-[#8A8576]"
                           />
                         </div>
                       </td>
@@ -432,9 +455,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
         /* Grid View */
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {filteredProducts.map((p) => {
-            const mainImage = p.images && p.images[0]?.src
-              ? formatImageUrl(p.images[0].src)
-              : "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=400";
+            const mainImage = p.images && p.images[0]?.src ? p.images[0].src : "";
 
             return (
               <div
@@ -443,13 +464,11 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
               >
                 {/* Image */}
                 <div className="relative aspect-4/3 bg-[#FAF9F6] border-b border-[#E5E2D9] overflow-hidden">
-                  <img
+                  <ProductImageFallback
                     src={mainImage}
                     alt={p.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=400";
-                    }}
+                    fallbackClassName="w-full h-full flex items-center justify-center bg-[#FAF9F6] text-[#8A8576]"
                   />
                   <div className="absolute top-2 left-2 flex gap-1">
                     <span className="px-2 py-0.5 bg-black/70 backdrop-blur-xs text-white text-[10px] font-mono rounded-xs">
