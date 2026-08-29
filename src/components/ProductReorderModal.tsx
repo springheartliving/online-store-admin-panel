@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   X, 
   ArrowUp, 
@@ -29,11 +29,56 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [draggedProductId, setDraggedProductId] = useState<number | null>(null);
+  const [dragPointer, setDragPointer] = useState<{ x: number; y: number } | null>(null);
+  const reorderListRef = useRef<HTMLDivElement | null>(null);
+
+  const clearDragState = () => {
+    setDraggedProductId(null);
+    setDragPointer(null);
+  };
+
+  const beginDrag = (event: React.PointerEvent<HTMLDivElement>, productId: number) => {
+    if (searchQuery || localProducts.length < 2) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    setDraggedProductId(productId);
+    setDragPointer({ x: event.clientX, y: event.clientY });
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggedProductId) return;
+
+    setDragPointer({ x: event.clientX, y: event.clientY });
+
+    const listElement = reorderListRef.current;
+    if (!listElement) return;
+
+    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest("[data-reorder-id]") as HTMLElement | null;
+    if (!target) return;
+
+    const targetId = Number(target.dataset.reorderId);
+    if (!Number.isFinite(targetId) || targetId === draggedProductId) return;
+
+    setLocalProducts((prev) => {
+      const fromIndex = prev.findIndex((product) => product.id === draggedProductId);
+      const toIndex = prev.findIndex((product) => product.id === targetId);
+      if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return prev;
+
+      const next = [...prev];
+      const [moved] = next.splice(fromIndex, 1);
+      if (!moved) return prev;
+      next.splice(toIndex, 0, moved);
+      return next;
+    });
+  };
 
   // Load latest data when modal opens
   useEffect(() => {
     if (isOpen) {
       loadLatestProducts();
+      clearDragState();
     }
   }, [isOpen]);
 
@@ -110,7 +155,8 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
       <div 
         id="product-reorder-modal" 
-        className="bg-white rounded-lg shadow-2xl border border-[#E5E2D9] w-full max-w-3xl h-[85vh] flex flex-col"
+        className="bg-white rounded-lg shadow-2xl border border-[#E5E2D9] w-full max-w-3xl h-[85vh] flex flex-col select-none"
+        style={{ WebkitUserSelect: "none", userSelect: "none" }}
       >
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-[#E5E2D9] flex items-center justify-between bg-[#FAF9F6]">
@@ -158,8 +204,22 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
           </button>
         </div>
 
+        <div className="px-4 py-2 border-b border-[#E5E2D9] bg-[#FAF9F6]">
+          <p className="text-[11px] text-[#6E6A5E] leading-relaxed">
+            {draggedProductId !== null
+              ? "正在拖曳：將商品移動到其他位置即可連續調整排序。"
+              : "可直接點擊箭頭調整，或直接拖曳商品到新位置。"}
+          </p>
+        </div>
+
         {/* List Content */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div
+          ref={reorderListRef}
+          className="flex-1 overflow-y-auto p-4 space-y-2"
+          onPointerMove={handlePointerMove}
+          onPointerUp={clearDragState}
+          onPointerLeave={clearDragState}
+        >
           {loading ? (
             <div className="h-full flex flex-col items-center justify-center space-y-2">
               <RefreshCw className="w-8 h-8 text-[#7C8B7C] animate-spin" />
@@ -182,7 +242,16 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
                 return (
                   <div 
                     key={product.id}
-                    className="flex items-center gap-3 p-2.5 bg-white border border-[#E5E2D9] rounded-sm hover:border-[#7C8B7C] hover:bg-[#FAF9F6] transition-all"
+                    data-reorder-id={String(product.id)}
+                    onContextMenu={(e) => e.preventDefault()}
+                    onPointerDown={(e) => beginDrag(e, product.id)}
+                    onPointerUp={clearDragState}
+                    className={`flex items-center gap-3 p-2.5 rounded-sm border transition-all select-none ${
+                      draggedProductId === product.id
+                        ? "bg-[#F4F6F1] border-[#7C8B7C] shadow-md opacity-40 scale-[0.99]"
+                        : "bg-white border-[#E5E2D9] hover:border-[#7C8B7C] hover:bg-[#FAF9F6]"
+                    }`}
+                    style={{ WebkitUserSelect: "none", userSelect: "none", touchAction: "none" }}
                   >
                     {/* Index Badge */}
                     <div className="w-10 text-center font-mono text-xs font-bold text-[#8A8576] bg-[#FAF9F6] py-1 border border-[#E5E2D9] rounded-sm shrink-0">
@@ -269,6 +338,35 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
             <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 p-2 rounded-sm text-center">
               ⚠️ 注意：在啟用「搜尋過濾」時，排序調整按鈕將會暫時禁用，以防止跨頁索引錯誤。如需調整順序，請清除搜尋。
             </p>
+          )}
+
+          {draggedProductId !== null && dragPointer && (
+            <div
+              className="pointer-events-none fixed z-[60] w-[280px] max-w-[70vw] -translate-x-1/2 -translate-y-1/2 rounded-sm border border-[#7C8B7C] bg-white shadow-xl opacity-95"
+              style={{ left: dragPointer.x, top: dragPointer.y }}
+            >
+              <div className="flex items-center gap-3 p-2.5">
+                <div className="w-10 h-10 bg-[#FAF9F6] border border-[#E5E2D9] rounded-sm overflow-hidden shrink-0">
+                  <img
+                    src={
+                      localProducts.find((product) => product.id === draggedProductId)?.images?.[0]?.src
+                        ? formatImageUrl(localProducts.find((product) => product.id === draggedProductId)!.images![0].src)
+                        : "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=200"
+                    }
+                    alt={localProducts.find((product) => product.id === draggedProductId)?.name || "drag item"}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-bold text-xs text-[#2D2D2D] truncate">
+                    {localProducts.find((product) => product.id === draggedProductId)?.name || "商品"}
+                  </h4>
+                  <p className="text-[10px] text-[#8A8576] font-mono uppercase truncate mt-0.5">
+                    SKU: {localProducts.find((product) => product.id === draggedProductId)?.sku || ""}
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
         </div>
 
