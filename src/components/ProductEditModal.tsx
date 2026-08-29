@@ -85,6 +85,9 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
   // Sync state when modal opens or product changes
   useEffect(() => {
     if (isOpen) {
+      const previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+
       setId(product ? product.id : Date.now());
       setName(product ? product.name : "");
       setSku(product ? product.sku : `SH-${Math.floor(1000 + Math.random() * 9000)}`);
@@ -130,6 +133,10 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       setAttrTerms("");
       setIsSubmitting(false);
       setErrorMsg(null);
+
+      return () => {
+        document.body.style.overflow = previousOverflow;
+      };
     }
   }, [isOpen, product, categories]);
 

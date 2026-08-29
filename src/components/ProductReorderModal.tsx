@@ -128,8 +128,15 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
   // Load latest data when modal opens
   useEffect(() => {
     if (isOpen) {
+      const previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+
       loadLatestProducts();
       clearDragState();
+
+      return () => {
+        document.body.style.overflow = previousOverflow;
+      };
     }
   }, [isOpen]);
 
@@ -206,7 +213,7 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
       <div 
         id="product-reorder-modal" 
-        className="bg-white rounded-xl shadow-2xl border border-[#E5E2D9] w-full max-w-3xl h-[85vh] flex flex-col select-none"
+        className="bg-white rounded-lg overflow-hidden shadow-2xl border border-[#E5E2D9] w-full max-w-3xl h-[85vh] flex flex-col select-none"
         style={{ WebkitUserSelect: "none", userSelect: "none" }}
       >
         {/* Header */}

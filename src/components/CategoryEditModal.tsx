@@ -27,12 +27,19 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
   // Sync state when modal opens or category changes
   useEffect(() => {
     if (isOpen) {
+      const previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+
       setId(category ? category.id : Date.now());
       setName(category ? category.name : "");
       setSlug(category ? category.slug : "");
       setSortOrder(category && category.sort_order !== undefined ? category.sort_order : 0);
       setIsSubmitting(false);
       setErrorMsg(null);
+
+      return () => {
+        document.body.style.overflow = previousOverflow;
+      };
     }
   }, [isOpen, category]);
 
