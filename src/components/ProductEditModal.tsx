@@ -8,8 +8,13 @@ const ProductImageFallback: React.FC<{
   alt: string;
   className?: string;
   fallbackClassName?: string;
-}> = ({ src, alt, className = "", fallbackClassName = "" }) => {
+  resetKey?: string | number;
+}> = ({ src, alt, className = "", fallbackClassName = "", resetKey }) => {
   const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [src, resetKey]);
 
   if (!src || hasError) {
     return (
@@ -485,6 +490,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                         alt={img.alt || name}
                         className="w-full h-full object-cover"
                         fallbackClassName="w-full h-full flex items-center justify-center text-[#8A8576]"
+                        resetKey={img.src}
                       />
                       
                       {/* 顯示目前圖片順序編號 */}
