@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Search, Plus, Edit3, Trash2, Tag, Layers, Info } from "lucide-react";
+import { Search, Plus, Edit3, Trash2 } from "lucide-react";
 import { Category, Product } from "../types";
 
 interface CategoryManagementProps {

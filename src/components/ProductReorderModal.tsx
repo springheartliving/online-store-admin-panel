@@ -7,7 +7,6 @@ import {
   ChevronsDown,
   RefreshCw,
   Save,
-  Check,
   Move,
   Image as ImageIcon
 } from "lucide-react";

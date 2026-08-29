@@ -1,59 +1,103 @@
 # Online Store Admin Panel
-**泉心生活 Spring Heart Living — 商品後台管理系統**
 
-管理員後台，用於管理 Firestore 資料庫中的商品與分類。
+泉心生活 Spring Heart Living — 商品後台管理系統
 
----
-
-## Tech Stack
-
-| 技術 | 版本 |
-|------|------|
-| React | 19 |
-| TypeScript | 5.8 |
-| Vite | 6 |
-| Tailwind CSS | 4 |
-| Firebase / Firestore | 12 |
-| lucide-react | 0.546 |
-| motion | 12 |
+這個專案是一個 React + Vite + Firebase 的後台管理介面，用於管理商品、分類與自訂排序，並直接同步到 Firestore。
 
 ---
 
-## 本地開發
+## 功能總覽
 
-### 1. 安裝套件
+- 商品維護：新增、編輯、刪除、複製商品
+- 分類維護：新增、編輯、刪除分類
+- 商品自訂排序：以拖曳或箭頭方式調整排序
+- 各分類商品數量統計
+- 商品/分類排序欄位支援 `sort_order`
+- 內建圖片失敗回退圖示
+- 背景 modal 鎖定頁面滾動
+
+---
+
+## 技術堆疊
+
+- React 19
+- TypeScript 5.8
+- Vite 6
+- Tailwind CSS 4
+- Firebase / Firestore
+- lucide-react
+
+---
+
+## 專案結構
+
+```bash
+online-store-admin-panel/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+├── public/
+├── src/
+│   ├── components/
+│   │   ├── AdminHeader.tsx
+│   │   ├── BrandLogo.tsx
+│   │   ├── CategoryEditModal.tsx
+│   │   ├── CategoryManagement.tsx
+│   │   ├── ProductEditModal.tsx
+│   │   ├── ProductManagement.tsx
+│   │   └── ProductReorderModal.tsx
+│   ├── lib/
+│   │   └── firebase.ts
+│   ├── utils/
+│   │   ├── categoryHelpers.ts
+│   │   ├── formatters.ts
+│   │   └── image.ts
+│   ├── App.tsx
+│   ├── index.css
+│   ├── main.tsx
+│   └── types.ts
+├── firebase-applet-config.json
+├── firebase-blueprint.json
+├── firestore.rules
+├── index.html
+├── metadata.json
+├── package.json
+├── server.ts
+├── tsconfig.json
+├── vite.config.ts
+├── README.md
+└── .gitignore
+```
+
+---
+
+## 安裝與啟動
+
+### 1) 安裝依賴
 
 ```bash
 npm install
 ```
 
-### 2. Firebase 設定
-
-Firebase 設定已硬編碼於 `firebase-applet-config.json`，不需要額外設定。
-
-### 3. 啟動開發伺服器
+### 2) 啟動開發伺服器
 
 ```bash
 npm run dev
 ```
 
-開啟 [http://localhost:5173](http://localhost:5173)
-
-### 4. TypeScript 型別檢查
+### 3) 型別檢查
 
 ```bash
 npm run type-check
 ```
 
----
-
-## 建置
+### 4) 建置正式檔
 
 ```bash
 npm run build
 ```
 
-輸出至 `dist/` 資料夾。可用以下指令預覽：
+### 5) 預覽建置結果
 
 ```bash
 npm run preview
@@ -61,77 +105,66 @@ npm run preview
 
 ---
 
-## 部署
+## Firebase 設定
 
-### GitHub Pages（自動部署）
+專案目前使用 Firestore 直接讀寫資料，並依賴下列設定檔：
 
-每次 push 到 `main` branch 即自動觸發 GitHub Actions 部署：
+- `firebase-applet-config.json`
+- `firebase-blueprint.json`
+- `firestore.rules`
 
-1. Runner 執行 `npm ci` + `npm run type-check` + `npm run build`
-2. 建置產物推送至 `gh-pages` branch
-3. 發布至 `https://<your-username>.github.io/online-store-admin-panel/`
+若你要在本機或部署環境重用，請確認 Firebase 專案與 Firestore collection 名稱一致，尤其是：
 
-**首次設定步驟：**
-
-1. 至 GitHub Repo → **Settings** → **Pages**
-2. Source 選擇 **"Deploy from a branch"**
-3. Branch 選 **`gh-pages`** / `/ (root)`
-4. 儲存後等待 Actions 完成即可
-
-### 手動觸發
-
-至 GitHub → **Actions** → **Deploy to GitHub Pages** → **Run workflow**
+- `products`
+- `categories`
 
 ---
 
-## 資料庫
+## 主要資料模型
 
-使用 **Cloud Firestore** 儲存商品、分類、報價單：
+### Product
 
-| Collection | 說明 |
-|------------|------|
-| `products` | 商品資料（含 `sort_order` 排序欄位）|
-| `categories` | 商品分類 |
+- `id`
+- `name`
+- `slug`
+- `sku`
+- `price`
+- `regular_price`
+- `is_published`
+- `in_stock`
+- `images`
+- `categories`
+- `tags`
+- `attributes`
+- `sort_order?`
 
-Firebase Project ID: `primeval-ellipse-39brs`  
-Firestore Database: `ai-studio-springheartlivin-f2a957a1-914f-42f7-afd3-33224e63e709`
+### Category
+
+- `id`
+- `name`
+- `slug`
+- `sort_order?`
 
 ---
 
-## 專案結構
+## 發布與部署
 
-```
-online-store-admin-panel/
-├── .github/
-│   └── workflows/
-│       └── deploy.yml          # GitHub Actions 自動部署
-├── src/
-│   ├── components/             # React 元件
-│   ├── lib/
-│   │   └── firebase.ts         # Firestore CRUD 操作
-│   ├── utils/                  # 工具函式
-│   ├── App.tsx                 # 主應用程式
-│   ├── main.tsx
-│   ├── types.ts                # TypeScript 型別定義
-│   └── index.css
-├── firebase-applet-config.json # Firebase 設定（公開，無 secret）
-├── firestore.rules             # Firestore 安全規則
-├── index.html
-├── package.json
-├── vite.config.ts
-└── tsconfig.json
+目前專案支援 Vite build，並可部署至靜態站點或 GitHub Pages / Vercel / Netlify 等平台，部署前請先執行：
+
+```bash
+npm run build
 ```
 
 ---
 
-## 功能說明
+## 注意事項
 
-- **商品管理** — 新增、編輯、刪除、複製商品，管理上架與庫存狀態，自訂排序
-- **分類管理** — 新增、編輯、刪除分類，查看各分類商品數量
-- **Firestore 資料** — 商品、分類與排序資料統一從 Cloud Firestore 讀寫
+- `sort_order` 是用來控制商品與分類顯示順序的主要欄位。
+- 若商品圖片網址失效，系統會顯示統一的圖片佔位 icon，而不是顯示看起來像真圖的錯誤內容。
+- modal 打開時會鎖定背景捲動，避免使用者在對話框內被底層頁面干擾。
 
 ---
 
-## License
+## 授權
 
-Private — 泉心生活 Spring Heart Living © 2026
+本專案為私人專案，僅供泉心生活 Spring Heart Living 內部後台維護使用。
