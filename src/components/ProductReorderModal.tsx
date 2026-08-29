@@ -59,10 +59,15 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
   const [draggedProductId, setDraggedProductId] = useState<number | null>(null);
   const [dragPointer, setDragPointer] = useState<{ x: number; y: number } | null>(null);
   const reorderListRef = useRef<HTMLDivElement | null>(null);
+  const dragAutoScrollRef = useRef<number | null>(null);
 
   const clearDragState = () => {
     setDraggedProductId(null);
     setDragPointer(null);
+    if (dragAutoScrollRef.current) {
+      cancelAnimationFrame(dragAutoScrollRef.current);
+      dragAutoScrollRef.current = null;
+    }
   };
 
   const isDragAllowedTarget = (target: EventTarget | null) => {
@@ -73,6 +78,9 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
   const beginDrag = (event: React.PointerEvent<HTMLDivElement>, productId: number) => {
     if (searchQuery || localProducts.length < 2 || !isDragAllowedTarget(event.target)) return;
 
+    const handle = (event.target as HTMLElement).closest("[data-drag-handle='true']");
+    if (!handle) return;
+
     event.preventDefault();
     event.stopPropagation();
     setDraggedProductId(productId);
@@ -82,10 +90,21 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!draggedProductId) return;
 
-    setDragPointer({ x: event.clientX, y: event.clientY });
-
     const listElement = reorderListRef.current;
     if (!listElement) return;
+
+    const rect = listElement.getBoundingClientRect();
+    const pointerY = event.clientY;
+    const scrollThreshold = 90;
+    const scrollStep = 14;
+
+    if (pointerY < rect.top + scrollThreshold) {
+      listElement.scrollTop = Math.max(0, listElement.scrollTop - scrollStep);
+    } else if (pointerY > rect.bottom - scrollThreshold) {
+      listElement.scrollTop = Math.min(listElement.scrollHeight - listElement.clientHeight, listElement.scrollTop + scrollStep);
+    }
+
+    setDragPointer({ x: event.clientX, y: event.clientY });
 
     const target = document.elementFromPoint(event.clientX, event.clientY)?.closest("[data-reorder-id]") as HTMLElement | null;
     if (!target) return;
@@ -187,7 +206,7 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
       <div 
         id="product-reorder-modal" 
-        className="bg-white rounded-lg shadow-2xl border border-[#E5E2D9] w-full max-w-3xl h-[85vh] flex flex-col select-none"
+        className="bg-white rounded-xl shadow-2xl border border-[#E5E2D9] w-full max-w-3xl h-[85vh] flex flex-col select-none"
         style={{ WebkitUserSelect: "none", userSelect: "none" }}
       >
         {/* Header */}
@@ -274,17 +293,20 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
                     key={product.id}
                     data-reorder-id={String(product.id)}
                     onContextMenu={(e) => e.preventDefault()}
-                    onPointerDown={(e) => beginDrag(e, product.id)}
-                    onPointerUp={clearDragState}
                     className={`flex items-center gap-3 p-2.5 rounded-sm border transition-all select-none ${
                       draggedProductId === product.id
                         ? "bg-[#F4F6F1] border-[#7C8B7C] shadow-md opacity-40 scale-[0.99]"
                         : "bg-white border-[#E5E2D9] hover:border-[#7C8B7C] hover:bg-[#FAF9F6]"
                     }`}
-                    style={{ WebkitUserSelect: "none", userSelect: "none", touchAction: "none" }}
+                    style={{ WebkitUserSelect: "none", userSelect: "none", touchAction: "pan-y" }}
                   >
                     {/* Index Badge */}
-                    <div className="w-10 text-center font-mono text-xs font-bold text-[#8A8576] bg-[#FAF9F6] py-1 border border-[#E5E2D9] rounded-sm shrink-0">
+                    <div
+                      data-drag-handle="true"
+                      onPointerDown={(e) => beginDrag(e, product.id)}
+                      onPointerUp={clearDragState}
+                      className="w-10 text-center font-mono text-xs font-bold text-[#8A8576] bg-[#FAF9F6] py-1 border border-[#E5E2D9] rounded-sm shrink-0 cursor-grab active:cursor-grabbing touch-none"
+                    >
                       {originalIndex + 1}
                     </div>
 

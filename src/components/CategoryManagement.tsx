@@ -92,7 +92,8 @@ export const CategoryManagement: React.FC<CategoryManagementProps> = ({
               <tr className="bg-[#FAF9F6] border-b border-[#E5E2D9] text-[#6E6A5E] font-bold uppercase tracking-wider">
                 <th className="py-3.5 px-4 w-16">ID</th>
                 <th className="py-3.5 px-4">分類名稱</th>
-                <th className="py-3.5 px-4">Slug 代碼</th>
+                <th className="py-3.5 px-4">Slug</th>
+                <th className="py-3.5 px-4 text-center w-28">排序</th>
                 <th className="py-3.5 px-4 text-center">包含商品數</th>
                 <th className="py-3.5 px-4 text-center w-28">操作</th>
               </tr>
@@ -100,7 +101,7 @@ export const CategoryManagement: React.FC<CategoryManagementProps> = ({
             <tbody className="divide-y divide-[#E5E2D9]">
               {filteredCategories.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-[#8A8576]">
+                  <td colSpan={6} className="py-8 text-center text-[#8A8576]">
                     尚未建立或找不到符合條件的商品分類
                   </td>
                 </tr>
@@ -120,6 +121,11 @@ export const CategoryManagement: React.FC<CategoryManagementProps> = ({
                       </td>
                       <td className="py-3.5 px-4 font-mono text-xs text-[#8A8576]">
                         {c.slug}
+                      </td>
+                      <td className="py-3.5 px-4 text-center font-mono">
+                        <span className="px-2.5 py-1 bg-[#FAF9F6] border border-[#E5E2D9] rounded-full text-xs font-bold text-[#2D2D2D]">
+                          {c.sort_order !== undefined ? c.sort_order : c.id}
+                        </span>
                       </td>
                       <td className="py-3.5 px-4 text-center font-mono">
                         <span className="px-2.5 py-1 bg-[#FAF9F6] border border-[#E5E2D9] rounded-full text-xs font-bold text-[#2D2D2D]">
