@@ -20,6 +20,7 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
   const [id, setId] = useState<number>(0);
   const [name, setName] = useState<string>("");
   const [slug, setSlug] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -29,6 +30,7 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
       setId(category ? category.id : Date.now());
       setName(category ? category.name : "");
       setSlug(category ? category.slug : "");
+      setSortOrder(category && category.sort_order !== undefined ? category.sort_order : 0);
       setIsSubmitting(false);
       setErrorMsg(null);
     }
@@ -54,6 +56,7 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
       id: Number(id),
       name: name.trim(),
       slug: slug.trim() || `category-${id}`,
+      sort_order: Number(sortOrder)
     };
 
     try {
@@ -120,6 +123,20 @@ export const CategoryEditModal: React.FC<CategoryEditModalProps> = ({
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
               placeholder="例如：spa-bubble-equipment"
+              className="w-full text-xs px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
+              排序
+            </label>
+            <input
+              type="number"
+              min="0"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(Number(e.target.value) || 0)}
+              placeholder="數字越小越前面"
               className="w-full text-xs px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
             />
           </div>

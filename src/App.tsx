@@ -44,6 +44,26 @@ function normalizeProducts(data: unknown): Product[] {
   });
 }
 
+function normalizeCategories(data: unknown): Category[] {
+  if (!Array.isArray(data)) return [];
+
+  return data
+    .map((item) => {
+      const category = item as Category;
+      return {
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        sort_order: category.sort_order
+      };
+    })
+    .sort((a, b) => {
+      const orderA = a.sort_order !== undefined ? a.sort_order : a.id;
+      const orderB = b.sort_order !== undefined ? b.sort_order : b.id;
+      return orderA - orderB;
+    });
+}
+
 export default function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -82,7 +102,7 @@ export default function App() {
         const fsCategories = await fetchCategoriesFromFirestore();
 
         setProducts(normalizeProducts(fsProducts));
-        setCategories(fsCategories);
+        setCategories(normalizeCategories(fsCategories));
       } catch (err) {
         console.error("Error loading Firestore data:", err);
       } finally {
@@ -187,13 +207,18 @@ export default function App() {
       }
 
       setCategories((prev) => {
-        const existingIdx = prev.findIndex((c) => c.id === categoryToSave.id);
+        const next = [...prev];
+        const existingIdx = next.findIndex((c) => c.id === categoryToSave.id);
         if (existingIdx >= 0) {
-          const next = [...prev];
           next[existingIdx] = categoryToSave;
-          return next;
+        } else {
+          next.push(categoryToSave);
         }
-        return [...prev, categoryToSave];
+        return next.sort((a, b) => {
+          const orderA = a.sort_order !== undefined ? a.sort_order : a.id;
+          const orderB = b.sort_order !== undefined ? b.sort_order : b.id;
+          return orderA - orderB;
+        });
       });
       showToast(editingCategory ? `已成功更新分類「${categoryToSave.name}」` : `已新增分類「${categoryToSave.name}」`);
     } catch (err: any) {

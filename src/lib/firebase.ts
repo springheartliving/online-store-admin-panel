@@ -60,7 +60,11 @@ export async function fetchCategoriesFromFirestore(): Promise<Category[]> {
     snapshot.forEach((docSnap) => {
       categories.push(docSnap.data() as Category);
     });
-    return categories;
+    return categories.sort((a, b) => {
+      const orderA = a.sort_order !== undefined ? a.sort_order : a.id;
+      const orderB = b.sort_order !== undefined ? b.sort_order : b.id;
+      return orderA - orderB;
+    });
   } catch (error) {
     console.error("Failed to fetch categories from Firestore:", error);
     return [];

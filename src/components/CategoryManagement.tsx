@@ -32,9 +32,15 @@ export const CategoryManagement: React.FC<CategoryManagementProps> = ({
 
   // Filter categories
   const filteredCategories = useMemo(() => {
-    if (!searchQuery.trim()) return categories;
+    const sortedCategories = [...categories].sort((a, b) => {
+      const orderA = a.sort_order !== undefined ? a.sort_order : a.id;
+      const orderB = b.sort_order !== undefined ? b.sort_order : b.id;
+      return orderA - orderB;
+    });
+
+    if (!searchQuery.trim()) return sortedCategories;
     const q = searchQuery.toLowerCase().trim();
-    return categories.filter(
+    return sortedCategories.filter(
       (c) =>
         c.name.toLowerCase().includes(q) ||
         c.slug.toLowerCase().includes(q)
