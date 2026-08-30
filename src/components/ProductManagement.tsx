@@ -311,7 +311,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
               <thead>
                 <tr className="bg-[#FAF9F6] border-b border-[#E5E2D9] text-[#6E6A5E] font-bold uppercase tracking-wider">
                   <th className="py-3 px-4 w-16">縮圖</th>
-                  <th className="py-3 px-4">ID / SKU</th>
+                  <th className="py-3 px-4">SKU</th>
                   <th className="py-3 px-4">商品名稱與分類</th>
                   <th className="py-3 px-4 text-right">售價 / 定價 (NT$)</th>
                   <th className="py-3 px-4 text-center">上架狀態</th>
@@ -338,9 +338,8 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                         </div>
                       </td>
 
-                      {/* ID / SKU */}
-                      <td className="py-3 px-4 font-mono text-[11px] text-[#6E6A5E]">
-                        <div className="font-bold text-[#2D2D2D]">#{p.id}</div>
+                      {/* SKU */}
+                      <td className="py-3 px-4 font-mono text-[11px] text-[#6E6A5E]">                        
                         <div className="text-[10px] text-[#8A8576] truncate max-w-[100px]">{p.sku}</div>
                       </td>
 
@@ -409,7 +408,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                           title="點擊切換庫存狀態"
                         >
                           {p.in_stock === true ? <PackageCheck className="w-3.5 h-3.5" /> : <PackageX className="w-3.5 h-3.5" />}
-                          <span>{p.in_stock === true ? "有庫存" : "無庫存"}</span>
+                          <span className="hidden sm:inline">{p.in_stock === true ? "有庫存" : "無庫存"}</span>
                         </button>
                       </td>
 
