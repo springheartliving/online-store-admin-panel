@@ -8,7 +8,8 @@ import {
   Sparkles, 
   Database,
   Building2,
-  Settings
+  Settings,
+  LogOut
 } from "lucide-react";
 import { BrandLogo } from "./BrandLogo";
 
@@ -23,6 +24,7 @@ interface AdminHeaderProps {
   totalCategories: number;
   onQuickAddProduct: () => void;
   onQuickAddCategory: () => void;
+  onLogout: () => void;
 }
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({
@@ -33,7 +35,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   inStockCount,
   totalCategories,
   onQuickAddProduct,
-  onQuickAddCategory
+  onQuickAddCategory,
+  onLogout
 }) => {
   return (
     <header className="w-full bg-white border-b border-[#E5E2D9] text-[#2D2D2D] sticky top-0 z-40 shadow-xs">
@@ -102,6 +105,14 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               <Plus className="w-3.5 h-3.5 text-[#7C8B7C]" />
               <span className="hidden sm:inline">新增分類</span>
               <span className="sm:hidden">分類</span>
+            </button>
+            <button
+              type="button"
+              onClick={onLogout}
+              className="px-3 py-2 bg-white hover:bg-[#FAF9F6] text-[#2D2D2D] font-medium text-xs rounded-sm border border-[#D1C9BC] shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5 text-[#7C8B7C]" />
+              <span className="hidden sm:inline">登出</span>
             </button>
           </div>
 

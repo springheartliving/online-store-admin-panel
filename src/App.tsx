@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { CheckCircle2, AlertCircle, Sparkles, RefreshCw, LockKeyhole, LogOut } from "lucide-react";
+import { CheckCircle2, AlertCircle, Sparkles, RefreshCw, LockKeyhole } from "lucide-react";
 import { Product, Category } from "./types";
 import { AdminHeader, AdminTab } from "./components/AdminHeader";
 import { ProductManagement } from "./components/ProductManagement";
@@ -368,15 +368,6 @@ export default function App() {
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={handleLogout}
-        className="fixed right-4 top-4 z-50 flex items-center gap-1.5 rounded-sm border border-[#D1C9BC] bg-white px-3 py-1.5 text-[11px] font-medium text-[#2D2D2D] shadow-sm hover:bg-[#FAF9F6]"
-      >
-        <LogOut className="w-3.5 h-3.5" />
-        登出
-      </button>
-
       {/* Admin Header */}
       <AdminHeader
         activeTab={activeTab}
@@ -393,6 +384,7 @@ export default function App() {
           setEditingCategory(null);
           setIsCategoryModalOpen(true);
         }}
+        onLogout={handleLogout}
       />
 
       {/* Main Content View */}
