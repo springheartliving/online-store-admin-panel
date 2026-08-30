@@ -387,12 +387,12 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                           {p.is_published ? (
                             <>
                               <PackageCheck className="w-3.5 h-3.5" />
-                              <span>已上架</span>
+                              <span className="hidden sm:inline">已上架</span>
                             </>
                           ) : (
                             <>
                               <PackageX className="w-3.5 h-3.5" />
-                              <span>已下架</span>
+                              <span className="hidden sm:inline">已下架</span>
                             </>
                           )}
                         </button>

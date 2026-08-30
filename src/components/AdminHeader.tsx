@@ -97,15 +97,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               <Plus className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">新增商品</span>
               <span className="sm:hidden">商品</span>
-            </button>
-            <button
-              onClick={onQuickAddCategory}
-              className="px-3 py-2 bg-[#FAF9F6] hover:bg-[#EAE7DC] text-[#2D2D2D] font-medium text-xs rounded-sm border border-[#D1C9BC] transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5 text-[#7C8B7C]" />
-              <span className="hidden sm:inline">新增分類</span>
-              <span className="sm:hidden">分類</span>
-            </button>
+            </button>            
             <button
               type="button"
               onClick={onLogout}
