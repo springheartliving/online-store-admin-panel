@@ -79,8 +79,9 @@ export default function App() {
   const expectedPassword = useMemo(() => (import.meta.env.VITE_ENTRY_PASSWORD ?? "").trim(), []);
 
   useEffect(() => {
+    const isLocalDev = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
     const savedUnlockState = localStorage.getItem(ACCESS_STORAGE_KEY) === "true";
-    setIsUnlocked(savedUnlockState);
+    setIsUnlocked(isLocalDev || savedUnlockState);
     setIsGateReady(true);
   }, []);
 

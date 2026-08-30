@@ -307,17 +307,20 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
         /* Table View */
         <div className="bg-white rounded-lg shadow-sm border border-[#E5E2D9] overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+            <table
+              className="w-full text-left border-collapse text-xs"
+              style={{ tableLayout: "auto", minWidth: "max-content" }}
+            >
               <thead>
                 <tr className="bg-[#FAF9F6] border-b border-[#E5E2D9] text-[#6E6A5E] font-bold uppercase tracking-wider">
-                  <th className="py-3 px-4 w-16">縮圖</th>
+                  <th className="py-3 px-4">縮圖</th>
                   <th className="py-3 px-4">SKU</th>
                   <th className="py-3 px-4">商品名稱與分類</th>
                   <th className="py-3 px-4 text-right">售價 / 定價 (NT$)</th>
                   <th className="py-3 px-4 text-center">上架狀態</th>
                   <th className="py-3 px-4 text-center">庫存狀態</th>
                   <th className="py-3 px-4 text-center">排序</th>
-                  <th className="py-3 px-4 text-center w-36">維護操作</th>
+                  <th className="py-3 px-4 text-center">維護操作</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E5E2D9]">
