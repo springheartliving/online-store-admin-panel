@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { CheckCircle2, AlertCircle, Sparkles, RefreshCw } from "lucide-react";
+import { CheckCircle2, AlertCircle, Sparkles, RefreshCw, LockKeyhole, LogOut } from "lucide-react";
 import { Product, Category } from "./types";
 import { AdminHeader, AdminTab } from "./components/AdminHeader";
 import { ProductManagement } from "./components/ProductManagement";
@@ -7,6 +7,7 @@ import { CategoryManagement } from "./components/CategoryManagement";
 import { ProductEditModal } from "./components/ProductEditModal";
 import { CategoryEditModal } from "./components/CategoryEditModal";
 import { ProductReorderModal } from "./components/ProductReorderModal";
+import { BrandLogo } from "./components/BrandLogo";
 
 import {
   fetchProductsFromFirestore,
@@ -64,10 +65,49 @@ function normalizeCategories(data: unknown): Category[] {
     });
 }
 
+const ACCESS_STORAGE_KEY = "spring-heart-admin-unlocked";
+
 export default function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isGateReady, setIsGateReady] = useState<boolean>(false);
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
+  const [passwordInput, setPasswordInput] = useState<string>("");
+  const [gateError, setGateError] = useState<string>("");
+
+  const expectedPassword = useMemo(() => (import.meta.env.VITE_ENTRY_PASSWORD ?? "").trim(), []);
+
+  useEffect(() => {
+    const savedUnlockState = localStorage.getItem(ACCESS_STORAGE_KEY) === "true";
+    setIsUnlocked(savedUnlockState);
+    setIsGateReady(true);
+  }, []);
+
+  const handleUnlock = () => {
+    if (!expectedPassword) {
+      setGateError("尚未設定密碼");
+      return;
+    }
+
+    if (passwordInput === expectedPassword) {
+      localStorage.setItem(ACCESS_STORAGE_KEY, "true");
+      setIsUnlocked(true);
+      setGateError("");
+      setPasswordInput("");
+      return;
+    }
+
+    setGateError("密碼錯誤");
+    setPasswordInput("");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(ACCESS_STORAGE_KEY);
+    setIsUnlocked(false);
+    setPasswordInput("");
+    setGateError("");
+  };
 
   // Active admin tab
   const [activeTab, setActiveTab] = useState<AdminTab>("products");
@@ -246,6 +286,67 @@ export default function App() {
   const publishedCount = useMemo(() => products.filter((p) => p.is_published).length, [products]);
   const inStockCount = useMemo(() => products.filter((p) => p.in_stock === true).length, [products]);
 
+  if (!isGateReady) {
+    return (
+      <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center">
+        <div className="flex items-center gap-3 text-[#6E6A5E] text-sm font-medium">
+          <RefreshCw className="w-4 h-4 animate-spin" />
+          載入中...
+        </div>
+      </div>
+    );
+  }
+
+  if (!isUnlocked) {
+    return (
+      <div className="min-h-screen bg-[#F5F1EA] flex items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-xl border border-[#E5E2D9] bg-white shadow-sm p-6 sm:p-7">
+          <div className="flex justify-center mb-5">
+            <div className="w-16 h-16 rounded-lg bg-[#FAF8F2] border border-[#E5E2D9] p-2 flex items-center justify-center">
+              <BrandLogo className="w-full h-full text-[#2E4F2D]" />
+            </div>
+          </div>
+
+          <div className="text-center mb-5">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-[#8A8576] font-semibold">Spring Heart Living</p>
+            <h1 className="mt-2 text-2xl font-bold text-[#2D2D2D]">後台維護</h1>
+          </div>
+
+          <label className="block text-xs font-semibold text-[#2D2D2D] mb-2">請輸入密碼</label>
+          <div className="relative">
+            <LockKeyhole className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A8576]" />
+            <input
+              type="password"
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleUnlock();
+                }
+              }}
+              placeholder="輸入密碼"
+              className="w-full rounded-sm border border-[#D1C9BC] bg-[#FAF9F6] pl-9 pr-3 py-2.5 text-sm text-[#2D2D2D] placeholder:text-[#8A8576] focus:outline-none focus:border-[#7C8B7C]"
+            />
+          </div>
+
+          {gateError && (
+            <div className="mt-3 rounded-sm border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+              {gateError}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={handleUnlock}
+            className="mt-5 w-full rounded-sm bg-[#7C8B7C] hover:bg-[#6A796A] text-white font-bold text-sm px-4 py-2.5 transition"
+          >
+            進入後台
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#FAF9F6] text-[#2D2D2D] font-sans antialiased flex flex-col">
       
@@ -266,6 +367,15 @@ export default function App() {
           </div>
         </div>
       )}
+
+      <button
+        type="button"
+        onClick={handleLogout}
+        className="fixed right-4 top-4 z-50 flex items-center gap-1.5 rounded-sm border border-[#D1C9BC] bg-white px-3 py-1.5 text-[11px] font-medium text-[#2D2D2D] shadow-sm hover:bg-[#FAF9F6]"
+      >
+        <LogOut className="w-3.5 h-3.5" />
+        登出
+      </button>
 
       {/* Admin Header */}
       <AdminHeader
