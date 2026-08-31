@@ -443,10 +443,7 @@ export default function App() {
       {/* Footer */}
       <footer className="bg-white border-t border-[#E5E2D9] py-6 text-center text-xs text-[#8A8576]">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="font-light">泉心生活 Spring Heart Living - 後台維護系統</p>
-          <p className="mt-1 font-mono text-[10px]">
-            Cloud Firestore DB • Firebase Applet ID: ai-studio-springheartlivin
-          </p>
+          <p className="font-light">泉心生活 Spring Heart Living - 後台維護系統</p>          
         </div>
       </footer>
 

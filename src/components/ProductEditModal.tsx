@@ -3,6 +3,18 @@ import { X, Plus, Trash2, Image as ImageIcon, Tag, Check, AlertCircle, ArrowLeft
 import { Product, Category, ProductImage, ProductAttribute } from "../types";
 import { formatImageUrl } from "../utils/formatters";
 
+const cleanNumericText = (value: string) => value.replace(/[^\d]/g, "");
+
+const handleNumericPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+  const pastedText = event.clipboardData.getData("text");
+
+  if (!pastedText) return;
+
+  if (/^[\d]+$/.test(pastedText) === false || /[\u4e00-\u9fa5]/.test(pastedText)) {
+    event.preventDefault();
+  }
+};
+
 const ProductImageFallback: React.FC<{
   src?: string;
   alt: string;
@@ -55,8 +67,8 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
   const [name, setName] = useState<string>("");
   const [sku, setSku] = useState<string>("");
   const [slug, setSlug] = useState<string>("");
-  const [price, setPrice] = useState<number>(0);
-  const [regularPrice, setRegularPrice] = useState<number>(0);
+  const [price, setPrice] = useState<string>("0");
+  const [regularPrice, setRegularPrice] = useState<string>("0");
   const [isPublished, setIsPublished] = useState<boolean>(true);
   const [inStock, setInStock] = useState<boolean>(false);
   const [isOnHot, setIsOnHot] = useState<boolean>(false);
@@ -77,7 +89,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
   const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
   const [attrName, setAttrName] = useState<string>("");
   const [attrTerms, setAttrTerms] = useState<string>("");
-  const [sortOrder, setSortOrder] = useState<number>(0);
+  const [sortOrder, setSortOrder] = useState<string>("0");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -92,13 +104,13 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       setName(product ? product.name : "");
       setSku(product ? product.sku : `SH-${Math.floor(1000 + Math.random() * 9000)}`);
       setSlug(product ? product.slug : "");
-      setPrice(product ? product.price : 0);
-      setRegularPrice(product ? product.regular_price : 0);
+      setPrice(product ? String(product.price) : "0");
+      setRegularPrice(product ? String(product.regular_price) : "0");
       setIsPublished(product ? product.is_published === true : false);
       setInStock(product ? product.in_stock === true : false);
       setIsOnHot(product ? Boolean(product.isOnHot) : false);
       setShortDescription(product ? product.short_description : "");
-      setSortOrder(product && product.sort_order !== undefined ? product.sort_order : 0);
+      setSortOrder(product && product.sort_order !== undefined ? String(product.sort_order) : "0");
       
       // Clean description/features to plain text without bullet prefixes
       let initialDesc = "";
@@ -261,7 +273,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       tags: mappedTags,
       images: validImages,
       attributes: attributes,
-      sort_order: Number(sortOrder)
+      sort_order: Number(sortOrder) || 0
     };
 
     try {
@@ -366,11 +378,18 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   售價 (NT$) <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="number"
-                  min="0"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   required
                   value={price}
-                  onChange={(e) => setPrice(Number(e.target.value))}
+                  onChange={(e) => setPrice(e.target.value === "" ? "" : cleanNumericText(e.target.value))}
+                  onPaste={handleNumericPaste}
+                  onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", "."].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
                   className="w-full text-sm px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
                 />
               </div>
@@ -380,10 +399,17 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   定價 (NT$)
                 </label>
                 <input
-                  type="number"
-                  min="0"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={regularPrice}
-                  onChange={(e) => setRegularPrice(Number(e.target.value))}
+                  onChange={(e) => setRegularPrice(e.target.value === "" ? "" : cleanNumericText(e.target.value))}
+                  onPaste={handleNumericPaste}
+                  onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", "."].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
                   className="w-full text-sm px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
                 />
               </div>
@@ -393,10 +419,17 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   自訂排序
                 </label>
                 <input
-                  type="number"
-                  min="0"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={sortOrder}
-                  onChange={(e) => setSortOrder(Number(e.target.value))}
+                  onChange={(e) => setSortOrder(e.target.value === "" ? "" : cleanNumericText(e.target.value))}
+                  onPaste={handleNumericPaste}
+                  onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", "."].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
                   placeholder="數字越小越前面"
                   className="w-full text-sm px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
                 />
