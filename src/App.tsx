@@ -13,6 +13,7 @@ import {
   fetchProductsFromFirestore,
   fetchCategoriesFromFirestore,
   saveProductToFirestore,
+  saveProductsToFirestore,
   deleteProductFromFirestore,
   saveCategoryToFirestore,
   deleteCategoryFromFirestore
@@ -37,8 +38,8 @@ function normalizeProducts(data: unknown): Product[] {
       features: product.features,
       categories: product.categories,
       tags: product.tags,
-      images: product.images.map(({ id, src }) => ({ id, src })),
-      attributes: product.attributes,
+      images: Array.isArray(product.images) ? product.images.map(({ id, src }) => ({ id, src })) : [],
+      attributes: Array.isArray(product.attributes) ? product.attributes : [],
       in_stock: product.in_stock === true,
       sort_order: product.sort_order
     };
@@ -225,6 +226,53 @@ export default function App() {
     setIsProductModalOpen(true);
   };
 
+  const handleExportProducts = () => {
+    const blob = new Blob([JSON.stringify(products, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `products-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showToast(`已匯出 ${products.length} 筆商品資料`);
+  };
+
+  const handleImportProducts = async (file: File) => {
+    try {
+      const rawData: unknown = JSON.parse(await file.text());
+      const importedData = Array.isArray(rawData)
+        ? rawData
+        : rawData && typeof rawData === "object" && "products" in rawData
+          ? (rawData as { products: unknown }).products
+          : null;
+
+      if (!Array.isArray(importedData) || importedData.length === 0) {
+        throw new Error("檔案中找不到商品資料");
+      }
+
+      const importedProducts = normalizeProducts(importedData);
+      if (importedProducts.some((product) => !Number.isFinite(product.id) || !product.name)) {
+        throw new Error("商品資料缺少有效的 ID 或名稱");
+      }
+
+      if (!window.confirm(`確定要匯入 ${importedProducts.length} 筆商品嗎？相同 ID 的商品將被更新。`)) {
+        return;
+      }
+
+      await saveProductsToFirestore(importedProducts);
+      setProducts((currentProducts) => {
+        const merged = new Map<number, Product>(currentProducts.map((product) => [product.id, product]));
+        importedProducts.forEach((product) => merged.set(product.id, product));
+        return Array.from(merged.values()).sort((a, b) =>
+          (a.sort_order ?? a.id) - (b.sort_order ?? b.id)
+        );
+      });
+      showToast(`已匯入 ${importedProducts.length} 筆商品資料`);
+    } catch (err: any) {
+      showToast(`商品匯入失敗: ${err.message || "檔案格式錯誤"}`, "error");
+    }
+  };
+
   // Category CRUD
   const handleSaveCategory = async (categoryToSave: Category) => {
     try {
@@ -385,6 +433,8 @@ export default function App() {
           setEditingCategory(null);
           setIsCategoryModalOpen(true);
         }}
+        onExportProducts={handleExportProducts}
+        onImportProducts={handleImportProducts}
         onLogout={handleLogout}
       />
 

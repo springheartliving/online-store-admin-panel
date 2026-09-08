@@ -86,6 +86,23 @@ export async function saveProductToFirestore(product: Product): Promise<void> {
 }
 
 /**
+ * Save multiple products to Firestore in batches of 500 documents.
+ */
+export async function saveProductsToFirestore(products: Product[]): Promise<void> {
+  for (let start = 0; start < products.length; start += 500) {
+    const batch = writeBatch(db);
+    const chunk = products.slice(start, start + 500);
+
+    chunk.forEach((product) => {
+      const docRef = doc(db, PRODUCTS_COLLECTION, String(product.id));
+      batch.set(docRef, product, { merge: true });
+    });
+
+    await batch.commit();
+  }
+}
+
+/**
  * Delete a product from Firestore database
  */
 export async function deleteProductFromFirestore(productId: string | number): Promise<void> {

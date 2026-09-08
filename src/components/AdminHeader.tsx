@@ -9,7 +9,9 @@ import {
   Database,
   Building2,
   Settings,
-  LogOut
+  LogOut,
+  Download,
+  Upload
 } from "lucide-react";
 import { BrandLogo } from "./BrandLogo";
 
@@ -24,6 +26,8 @@ interface AdminHeaderProps {
   totalCategories: number;
   onQuickAddProduct: () => void;
   onQuickAddCategory: () => void;
+  onExportProducts: () => void;
+  onImportProducts: (file: File) => void;
   onLogout: () => void;
 }
 
@@ -36,8 +40,16 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   totalCategories,
   onQuickAddProduct,
   onQuickAddCategory,
+  onExportProducts,
+  onImportProducts,
   onLogout
 }) => {
+  const handleImportFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) onImportProducts(file);
+    event.target.value = "";
+  };
+
   return (
     <header className="w-full bg-white border-b border-[#E5E2D9] text-[#2D2D2D] sticky top-0 z-40 shadow-xs">
       
@@ -141,6 +153,31 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               <Tag className="w-4 h-4" />
               <span>分類維護 ({totalCategories})</span>
             </button>
+
+            <div className="ml-1 flex items-center gap-1 border-l border-[#D1C9BC] pl-2 shrink-0">
+              <button
+                type="button"
+                onClick={onExportProducts}
+                title="匯出商品資料"
+                className="px-3 py-2 rounded-sm text-xs font-bold text-[#6E6A5E] hover:text-[#2D2D2D] hover:bg-[#EAE7DC] transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>匯出商品</span>
+              </button>
+              <label
+                title="匯入商品資料"
+                className="px-3 py-2 rounded-sm text-xs font-bold text-[#6E6A5E] hover:text-[#2D2D2D] hover:bg-[#EAE7DC] transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>匯入商品</span>
+                <input
+                  type="file"
+                  accept="application/json,.json"
+                  onChange={handleImportFile}
+                  className="hidden"
+                />
+              </label>
+            </div>
 
           </nav>
         </div>
