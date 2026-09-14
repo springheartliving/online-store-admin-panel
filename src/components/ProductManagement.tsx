@@ -192,10 +192,10 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
             <button
               onClick={onOpenReorder}
               className="px-4 py-2.5 bg-white hover:bg-[#FAF9F6] border border-[#D1C9BC] text-[#2D2D2D] font-bold text-xs rounded-sm shadow-xs transition flex items-center gap-1.5 cursor-pointer active:scale-98"
-              title="按此讀取商品自訂排序並進行重新排序調整"
+              title="按此讀取商品排序並進行重新排序調整"
             >
               <Move className="w-4 h-4 text-[#7C8B7C]" />
-              <span>自訂排序維護</span>
+              <span>排序維護</span>
             </button>
 
             {/* Add Product Button */}
@@ -204,7 +204,7 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
               className="px-4 py-2.5 bg-[#7C8B7C] hover:bg-[#6A796A] text-white font-bold text-xs rounded-sm shadow-xs transition flex items-center gap-1.5 cursor-pointer active:scale-98"
             >
               <Plus className="w-4 h-4" />
-              <span>新增商品維護</span>
+              <span>新增商品</span>
             </button>
           </div>
         </div>

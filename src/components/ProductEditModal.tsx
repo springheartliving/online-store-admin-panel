@@ -222,6 +222,16 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       return;
     }
 
+    if (!sku.trim()) {
+      setErrorMsg("請輸入品號");
+      return;
+    }
+
+    if (!pv.trim()) {
+      setErrorMsg("請輸入 PV (積分)");
+      return;
+    }
+
     if (selectedCategoryIds.length === 0) {
       setErrorMsg("請至少選擇一個商品分類");
       return;
@@ -343,10 +353,11 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-                  品號
+                  品號 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
+                  required
                   value={sku}
                   onChange={(e) => setSku(e.target.value)}
                   placeholder=""
@@ -419,12 +430,13 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-                  PV (積分)
+                  PV (積分) <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
+                  required
                   value={pv}
                   onChange={(e) => setPv(e.target.value === "" ? "" : cleanNumericText(e.target.value))}
                   onPaste={handleNumericPaste}
@@ -439,7 +451,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-                  自訂排序
+                  排序
                 </label>
                 <input
                   type="text"
