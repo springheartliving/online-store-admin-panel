@@ -332,7 +332,7 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
                         {product.name}
                       </h4>
                       <p className="text-[10px] text-[#8A8576] font-mono uppercase truncate mt-0.5">
-                        SKU: {product.sku}
+                        品號: {product.sku}
                       </p>
                     </div>
 
@@ -423,7 +423,7 @@ export const ProductReorderModal: React.FC<ProductReorderModalProps> = ({
                     {localProducts.find((product) => product.id === draggedProductId)?.name || "商品"}
                   </h4>
                   <p className="text-[10px] text-[#8A8576] font-mono uppercase truncate mt-0.5">
-                    SKU: {localProducts.find((product) => product.id === draggedProductId)?.sku || ""}
+                    品號: {localProducts.find((product) => product.id === draggedProductId)?.sku || ""}
                   </p>
                 </div>
               </div>

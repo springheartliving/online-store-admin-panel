@@ -69,6 +69,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
   const [slug, setSlug] = useState<string>("");
   const [price, setPrice] = useState<string>("0");
   const [regularPrice, setRegularPrice] = useState<string>("0");
+  const [pv, setPv] = useState<string>("0");
   const [isPublished, setIsPublished] = useState<boolean>(true);
   const [inStock, setInStock] = useState<boolean>(false);
   const [isOnHot, setIsOnHot] = useState<boolean>(false);
@@ -102,15 +103,16 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
       setId(product ? product.id : Date.now());
       setName(product ? product.name : "");
-      setSku(product ? product.sku : `SH-${Math.floor(1000 + Math.random() * 9000)}`);
+      setSku(product ? product.sku : "");
       setSlug(product ? product.slug : "");
       setPrice(product ? String(product.price) : "0");
       setRegularPrice(product ? String(product.regular_price) : "0");
+      setPv(product ? String(product.pv ?? 0) : "");
       setIsPublished(product ? product.is_published === true : false);
       setInStock(product ? product.in_stock === true : false);
       setIsOnHot(product ? Boolean(product.isOnHot) : false);
       setShortDescription(product ? product.short_description : "");
-      setSortOrder(product && product.sort_order !== undefined ? String(product.sort_order) : "0");
+      setSortOrder(product && product.sort_order !== undefined ? String(product.sort_order) : "99");
       
       // Clean description/features to plain text without bullet prefixes
       let initialDesc = "";
@@ -263,6 +265,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       slug: slug.trim() || `product-${id}`,
       price: Number(price) || 0,
       regular_price: Number(regularPrice) || Number(price) || 0,
+      pv: Number(pv) || 0,
       is_published: isPublished,
       isOnHot,
       in_stock: inStock,
@@ -333,20 +336,20 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="例如：摩雅精油 - 快樂鼠尾草 10ml"
+                  placeholder=""
                   className="w-full text-sm px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-                  SKU
+                  品號
                 </label>
                 <input
                   type="text"
                   value={sku}
                   onChange={(e) => setSku(e.target.value)}
-                  placeholder="例如：SH-ESS-001"
+                  placeholder=""
                   className="w-full text-sm px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
                 />
               </div>
@@ -372,7 +375,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
               價格與狀態
             </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
                   售價 (NT$) <span className="text-red-500">*</span>
@@ -404,6 +407,26 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   pattern="[0-9]*"
                   value={regularPrice}
                   onChange={(e) => setRegularPrice(e.target.value === "" ? "" : cleanNumericText(e.target.value))}
+                  onPaste={handleNumericPaste}
+                  onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", "."].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  className="w-full text-sm px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
+                  PV (積分)
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={pv}
+                  onChange={(e) => setPv(e.target.value === "" ? "" : cleanNumericText(e.target.value))}
                   onPaste={handleNumericPaste}
                   onKeyDown={(e) => {
                     if (["e", "E", "+", "-", "."].includes(e.key)) {

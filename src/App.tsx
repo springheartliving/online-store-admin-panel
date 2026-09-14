@@ -31,6 +31,7 @@ function normalizeProducts(data: unknown): Product[] {
       sku: product.sku,
       price: product.price,
       regular_price: product.regular_price,
+      pv: product.pv ?? 0,
       is_published: product.is_published === true,
       isOnHot: product.isOnHot === true,
       short_description: product.short_description,
