@@ -23,7 +23,8 @@ export interface Product {
   sku: string;
   price: number;
   regular_price: number;
-  pv: number;
+  pv_usd: number;
+  pv_ntd: number;
   is_published: boolean;
   isOnHot?: boolean;
   short_description: string;

@@ -69,7 +69,8 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
   const [slug, setSlug] = useState<string>("");
   const [price, setPrice] = useState<string>("0");
   const [regularPrice, setRegularPrice] = useState<string>("0");
-  const [pv, setPv] = useState<string>("0");
+  const [pvUsd, setPvUsd] = useState<string>("0");
+  const [pvNtd, setPvNtd] = useState<string>("0");
   const [isPublished, setIsPublished] = useState<boolean>(true);
   const [inStock, setInStock] = useState<boolean>(false);
   const [isOnHot, setIsOnHot] = useState<boolean>(false);
@@ -107,7 +108,8 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       setSlug(product ? product.slug : "");
       setPrice(product ? String(product.price) : "0");
       setRegularPrice(product ? String(product.regular_price) : "0");
-      setPv(product ? String(product.pv ?? 0) : "");
+      setPvUsd(product ? String(product.pv_usd ?? 0) : "0");
+      setPvNtd(product ? String(product.pv_ntd ?? 0) : "0");
       setIsPublished(product ? product.is_published === true : false);
       setInStock(product ? product.in_stock === true : false);
       setIsOnHot(product ? Boolean(product.isOnHot) : false);
@@ -227,11 +229,6 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       return;
     }
 
-    if (!pv.trim()) {
-      setErrorMsg("請輸入 PV (積分)");
-      return;
-    }
-
     if (selectedCategoryIds.length === 0) {
       setErrorMsg("請至少選擇一個商品分類");
       return;
@@ -275,7 +272,8 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
       slug: slug.trim() || `product-${id}`,
       price: Number(price) || 0,
       regular_price: Number(regularPrice) || Number(price) || 0,
-      pv: Number(pv) || 0,
+      pv_usd: Number(pvUsd) || 0,
+      pv_ntd: Number(pvNtd) || 0,
       is_published: isPublished,
       isOnHot,
       in_stock: inStock,
@@ -386,7 +384,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
               價格與狀態
             </h4>
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
                   售價 (NT$) <span className="text-red-500">*</span>
@@ -430,15 +428,34 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
-                  PV (積分) <span className="text-red-500">*</span>
+                  PV (USD)
                 </label>
                 <input
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  required
-                  value={pv}
-                  onChange={(e) => setPv(e.target.value === "" ? "" : cleanNumericText(e.target.value))}
+                  value={pvUsd}
+                  onChange={(e) => setPvUsd(e.target.value === "" ? "" : cleanNumericText(e.target.value))}
+                  onPaste={handleNumericPaste}
+                  onKeyDown={(e) => {
+                    if (["e", "E", "+", "-", "."].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  className="w-full text-sm px-3.5 py-2 border border-[#D1C9BC] rounded-sm focus:outline-none focus:border-[#7C8B7C]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#2D2D2D] mb-1">
+                  PV (NTD)
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={pvNtd}
+                  onChange={(e) => setPvNtd(e.target.value === "" ? "" : cleanNumericText(e.target.value))}
                   onPaste={handleNumericPaste}
                   onKeyDown={(e) => {
                     if (["e", "E", "+", "-", "."].includes(e.key)) {

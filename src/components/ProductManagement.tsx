@@ -317,7 +317,8 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                   <th className="py-3 px-4">品號</th>
                   <th className="py-3 px-4">商品名稱與分類</th>
                   <th className="py-3 px-4 text-right">售價 / 定價 (NT$)</th>
-                  <th className="py-3 px-4 text-right">PV (積分)</th>
+                  <th className="py-3 px-4 text-right">PV (USD)</th>
+                  <th className="py-3 px-4 text-right">PV (NTD)</th>
                   <th className="py-3 px-4 text-center">上架狀態</th>
                   <th className="py-3 px-4 text-center">庫存狀態</th>
                   <th className="py-3 px-4 text-center">排序</th>
@@ -376,9 +377,12 @@ export const ProductManagement: React.FC<ProductManagementProps> = ({
                         )}
                       </td>
 
-                      {/* PV */}
                       <td className="py-3 px-4 text-right font-mono font-bold text-sm text-[#2D2D2D]">
-                        {p.pv ?? 0}
+                        {p.pv_usd ?? 0}
+                      </td>
+
+                      <td className="py-3 px-4 text-right font-mono font-bold text-sm text-[#2D2D2D]">
+                        {p.pv_ntd ?? 0}
                       </td>
 
                       {/* Stock Status Switch */}
