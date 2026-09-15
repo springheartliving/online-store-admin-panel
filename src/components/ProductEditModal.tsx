@@ -254,7 +254,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
     if (validImages.length === 0) {
       validImages.push({
         id: 1,
-        src: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=800",
+        src: "",
         alt: name
       });
     }
@@ -268,8 +268,8 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
     const updatedProduct: Product = {
       id: Number(id),
       name: name.trim(),
-      sku: sku.trim() || `SH-${id}`,
-      slug: slug.trim() || `product-${id}`,
+      sku: sku.trim(),
+      slug: slug.trim(),
       price: Number(price) || 0,
       regular_price: Number(regularPrice) || Number(price) || 0,
       pv_usd: Number(pvUsd) || 0,
